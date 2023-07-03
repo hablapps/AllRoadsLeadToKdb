@@ -12,10 +12,10 @@ system"c 200 250";
 .pykx.i.defaultConv:"pd";
 
 // data loading
-weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":abr_meteo23.csv";
-traffic:.Q.id("IPS  J S";enlist ";")0:`$":04-2023.csv";
-weather_station:.Q.id("SISS";enlist ";")0:`$":Estaciones_control_datos_meteorologicos.csv";
-traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":pmed_ubicacion_04-2023.csv";
+weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":../data/abr_meteo23.csv";
+traffic:.Q.id("IPS  J S";enlist ";")0:`$":../data/04-2023.csv";
+weather_station:.Q.id("SISS";enlist ";")0:`$":../data/Estaciones_control_datos_meteorologicos.csv";
+traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":../data/pmed_ubicacion_04-2023.csv";
 
 // preprocess weather data
 weather:`ESTACION`FECHA xcols `ANO`MES`DIA _update FECHA:"D"$(raze')flip(ANO;MES;DIA) from weather;

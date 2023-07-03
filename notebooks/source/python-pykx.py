@@ -6,11 +6,12 @@
 
 import pykx as kx
 from sklearn.linear_model import LinearRegression
+from scipy.spatial.distance import cdist
 
 kx.q('system"c 200 250"')
 
 # We assume a pykx object loaded somehow...
-weather_ori_kx = kx.q.read.csv('abr_meteo23.csv', types='IIII****FSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFS', delimiter=';', as_table=True)
+weather_ori_kx = kx.q.read.csv('../data/abr_meteo23.csv', types='IIII****FSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFSFS', delimiter=';', as_table=True)
 
 # Instead of turning into pandas, we start adapting expressions
 
@@ -46,13 +47,13 @@ u = kx.q('`$', kx.q.string(u))
 kx.q.set('magnitude', magnitude)
 df1 = kx.q.qsql.update(weather, columns = {'MAGNITUD': 'magnitude "j"$MAGNITUD'})
 weather = kx.q('{exec x#MAGNITUD!VALOR by FECHA,HORA,ESTACION from y}', u, df1)
-wstation = kx.q.read.csv('Estaciones_control_datos_meteorologicos.csv', types=" IFF", delimiter=";", as_table=True)
+wstation = kx.q.read.csv('../data/Estaciones_control_datos_meteorologicos.csv', types=" IFF", delimiter=";", as_table=True)
 wstation = kx.q.xcol({'CODIGO_CORTO': 'ESTACION'}, kx.q.xkey('CODIGO_CORTO', wstation))
 wjoin = kx.q.lj(weather, wstation)
 wjoin = kx.q.qsql.delete(wjoin, columns = ['ESTACION'])
 wjoin = kx.q('xkey[`FECHA`HORA`LATITUD`LONGITUD]', wjoin)
 
-pmed = kx.q.read.csv('pmed_ubicacion_04-2023.csv', types = "SII**FFFF", delimiter = ";", as_table=True)
+pmed = kx.q.read.csv('../data/pmed_ubicacion_04-2023.csv', types = "SII**FFFF", delimiter = ";", as_table=True)
 pmedpos = kx.q('`longitud`latitud#', pmed)
 wstapos = kx.q('`LONGITUD`LATITUD#0!', wstation)
 dist = kx.toq(cdist(pmedpos.pd(), wstapos.pd()))
@@ -60,7 +61,7 @@ ids = kx.q.each(kx.q('{first where x=min x}'), dist)
 pmedest = kx.q('^', pmed, kx.q('0!', wstation)[ids])
 pmedest = kx.q.qsql.delete(pmedest, columns = ['LONGITUD', 'LATITUD'])
 
-traffic = kx.q.read.csv('04-2023.csv', types = "IPSIIIISI", delimiter = ";", as_table = True)
+traffic = kx.q.read.csv('../data/04-2023.csv', types = "IPSIIIISI", delimiter = ";", as_table = True)
 trapmedest = kx.q.lj(traffic, kx.q.xkey('id', pmedest))
 
 weather = kx.q.qsql.update(weather, {'fecha': 'FECHA+HORA'})
@@ -98,7 +99,7 @@ comp = kx.q.qsql.update(comp,
 comp = kx.q('0^', comp)
 
 # distrito = kx.q.read.csv("Distritos.csv", types = "JFFJJSSS", delimiter=";", as_table=True)
-distrito = kx.q('("SISS";enlist ";")0:`$":Estaciones_control_datos_meteorologicos.csv"')
+distrito = kx.q('("SISS";enlist ";")0:`$":../data/Estaciones_control_datos_meteorologicos.csv"')
 distrito = kx.q("1!", distrito)
 
 rainyJam = kx.q.qsql.select(ajoin,

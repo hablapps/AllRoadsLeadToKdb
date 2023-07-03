@@ -17,14 +17,14 @@ import csv
 #########################
 
 #Cargar tabla trafico
-trafico = pd.read_csv('04-2023.csv', sep = ";", quotechar='"', encoding='utf-8').dropna()
+trafico = pd.read_csv('../data/04-2023.csv', sep = ";", quotechar='"', encoding='utf-8').dropna()
 
 #Cargar tabla meteorológica
-weather_ori = pd.read_csv('abr_meteo23.csv', sep = ";", quoting=csv.QUOTE_NONE, encoding='utf-8').dropna()
+weather_ori = pd.read_csv('../data/abr_meteo23.csv', sep = ";", quoting=csv.QUOTE_NONE, encoding='utf-8').dropna()
 
 #Carga tablas estaciones y localizaciones
-df3 = pd.read_csv('pmed_ubicacion_04-2023.csv', sep = ";", quoting=csv.QUOTE_NONE, encoding='utf-8').dropna()
-df4 = pd.read_csv('Estaciones_control_datos_meteorologicos.csv', sep = ";", quoting=csv.QUOTE_NONE, encoding='latin-1')
+df3 = pd.read_csv('../data/pmed_ubicacion_04-2023.csv', sep = ";", quoting=csv.QUOTE_NONE, encoding='utf-8').dropna()
+df4 = pd.read_csv('../data/Estaciones_control_datos_meteorologicos.csv', sep = ";", quoting=csv.QUOTE_NONE, encoding='latin-1')
 
 # Cambiar Año/Mes/Dia por fecha
 weather_ori = weather_ori.rename(columns={"ANO": "year", "MES": "month", "DIA":"day"})
@@ -87,7 +87,7 @@ weather = weather.groupby([ "FECHA", "ESTACION"]).sum().reset_index()
 # Calculo de distancias de sensores meteo y trafico
 distancias = pd.DataFrame()
 distancias["id"] = pd.Series([df3.index[np.argmin(x)] for x in cdist(df4[["LONGITUD", "LATITUD"]], df3[["\"longitud\"","\"latitud\""]])])
-distancias["ESTACION"] = df4["CÓDIGO_CORTO"]
+distancias["ESTACION"] = df4["CODIGO_CORTO"]
 
 #######################
 #### JUNTAR TABLAS ####

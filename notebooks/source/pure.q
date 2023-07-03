@@ -1,7 +1,7 @@
 system"l ml/ml.q";
 .ml.loadfile`:init.q;
 
-weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":abr_meteo23.csv";
+weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":../data/abr_meteo23.csv";
 weather:`ESTACION`FECHA xcols `ANO`MES`DIA _update FECHA:"D"$(raze')flip(ANO;MES;DIA) from weather;
 cw:cols weather;
 mc:(neg 2*24)_ cw;
@@ -18,11 +18,11 @@ u:value mag;
 weather:0!exec u#MAGNITUD!VALOR by FECHA,ESTACION from weather;
 weather:lower[cols weather]xcol weather;
 
-traffic:.Q.id("IPS  J S";enlist ";")0:`$":04-2023.csv";
+traffic:.Q.id("IPS  J S";enlist ";")0:`$":../data/04-2023.csv";
 traffic: `fecha xasc select avg carga by fecha,id from traffic where error=`N;
 
-weather_station:.Q.id("SISS";enlist ";")0:`$":Estaciones_control_datos_meteorologicos.csv";
-traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":pmed_ubicacion_04-2023.csv";
+weather_station:.Q.id("SISS";enlist ";")0:`$":../data/Estaciones_control_datos_meteorologicos.csv";
+traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":../data/pmed_ubicacion_04-2023.csv";
 
 b:select "F"$ string LONGITUD, "F"$ string LATITUD from weather_station;
 a:select "F"$ string longitud, "F"$ string latitud from traffic_station;

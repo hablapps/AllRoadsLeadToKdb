@@ -99,8 +99,7 @@ comp = kx.q.qsql.update(comp,
 comp = kx.q('0^', comp)
 
 # distrito = kx.q.read.csv("Distritos.csv", types = "JFFJJSSS", delimiter=";", as_table=True)
-distrito = kx.q('("SISS";enlist ";")0:`$":../data/Estaciones_control_datos_meteorologicos.csv"')
-distrito = kx.q("1!", distrito)
+distrito = kx.q('1!("JFFJJSSS";enlist ";")0:`$":../data/Distritos.csv"')
 
 rainyJam = kx.q.qsql.select(ajoin,
                             columns = {'PRECIPITACION': 'avg PRECIPITACION',
@@ -108,6 +107,9 @@ rainyJam = kx.q.qsql.select(ajoin,
                                        'CARGA': 'avg carga'},
                             by = {'OBJECTID': 'distrito'},
                             where = ['carga>75', 'PRECIPITACION>0'])
+
+from IPython.core.debugger import set_trace;set_trace()
+
 rainyJam = kx.q.lj(rainyJam, distrito)
 rainyJam = kx.q.qsql.select(rainyJam, columns = ['NOMBRE', 'PRECIPITACION', 'TEMPERATURA', 'CARGA'])
 

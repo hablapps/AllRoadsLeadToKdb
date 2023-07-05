@@ -30,10 +30,10 @@ weather_ori["FECHA"] = pd.to_datetime(weather_ori[["year", "month", "day"]])
 ####  TRAFFIC PREPROCESSING ####
 ################################
 
-trafico= trafico[trafico["error"] == "N"]
-trafico['FECHA'] = pd.to_datetime(trafico['fecha'], errors='coerce')
-trafico.drop(["tipo_elem", "error", "intensidad", "ocupacion",  "vmed", "periodo_integracion", "fecha"], axis=1, inplace=True)
-trafico.resample("1H", on="FECHA").mean()
+traffic= traffic[traffic["error"] == "N"]
+traffic['FECHA'] = pd.to_datetime(traffic['fecha'], errors='coerce')
+traffic.drop(["tipo_elem", "error", "intensidad", "ocupacion",  "vmed", "periodo_integracion", "fecha"], axis=1, inplace=True)
+traffic.resample("1H", on="FECHA").mean()
 
 #############################
 #### METEO PREPROCESSING ####
@@ -78,11 +78,10 @@ distancias["ESTACION"] = df4["CODIGO_CORTO"]
 #####################
 
 df5 = weather.merge(distancias, on="ESTACION")
-df5 = df5.merge(trafico, on=["id", "FECHA"])
+df5 = df5.merge(traffic, on=["id", "FECHA"])
 df5.rename(columns={"id": 'estacion_traf'}, inplace=True)
 df5["WEEKDAY"] = df5["FECHA"].dt.weekday
 df5["HOUR"] = df5["FECHA"].dt.hour
-print(df5)
 
 #######################
 #### SKLEARN MODEL ####

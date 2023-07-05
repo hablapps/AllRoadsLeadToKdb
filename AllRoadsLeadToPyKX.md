@@ -227,9 +227,9 @@ following one, without modifications:
 from sklearn.linear_model import LinearRegression
 
 
-def modelo(tabla):
-    X = tabla[["direccion", "humedad", "precipitacion", "presion", "solar", "temperatura", "viento" ]].to_numpy()
-    y = tabla["carga"].to_numpy().ravel()
+def model(table):
+    X = table[["direccion", "humedad", "precipitacion", "presion", "solar", "temperatura", "viento" ]].to_numpy()
+    y = table["carga"].to_numpy().ravel()
     reg = LinearRegression().fit(X, y)
 
     return reg.score(X, y)

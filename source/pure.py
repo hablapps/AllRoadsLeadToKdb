@@ -69,15 +69,15 @@ weather = weather.groupby([ "FECHA", "ESTACION"]).sum().reset_index()
 ####  DISTANCE PREPROCESSING  ####
 ##################################
 
-distancias = pd.DataFrame()
-distancias["id"] = pd.Series([df3.index[np.argmin(x)] for x in cdist(df4[["LONGITUD", "LATITUD"]], df3[["\"longitud\"","\"latitud\""]])])
-distancias["ESTACION"] = df4["CODIGO_CORTO"]
+distances = pd.DataFrame()
+distances["id"] = pd.Series([df3.index[np.argmin(x)] for x in cdist(df4[["LONGITUD", "LATITUD"]], df3[["\"longitud\"","\"latitud\""]])])
+distances["ESTACION"] = df4["CODIGO_CORTO"]
 
 #####################
 #### JOIN TABLES ####
 #####################
 
-df5 = weather.merge(distancias, on="ESTACION")
+df5 = weather.merge(distances, on="ESTACION")
 df5 = df5.merge(traffic, on=["id", "FECHA"])
 df5.rename(columns={"id": 'estacion_traf'}, inplace=True)
 df5["WEEKDAY"] = df5["FECHA"].dt.weekday

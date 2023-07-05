@@ -108,8 +108,6 @@ rainyJam = kx.q.qsql.select(ajoin,
                             by = {'OBJECTID': 'distrito'},
                             where = ['carga>75', 'PRECIPITACION>0'])
 
-# from IPython.core.debugger import set_trace;set_trace()
-
 rainyJam = kx.q.lj(rainyJam, district)
 rainyJam = kx.q.qsql.select(rainyJam, columns = ['NOMBRE', 'PRECIPITACION', 'TEMPERATURA', 'CARGA'])
 
@@ -117,11 +115,11 @@ print(rainyJam)
 
 comp = comp.pd()
 
-def modelo(tabla):
-    X = tabla[["direccion", "humedad", "precipitacion", "presion", "solar", "temperatura", "viento" ]].to_numpy()
-    y = tabla["carga"].to_numpy().ravel()
+def model(table):
+    X = table[["direccion", "humedad", "precipitacion", "presion", "solar", "temperatura", "viento" ]].to_numpy()
+    y = table["carga"].to_numpy().ravel()
     reg = LinearRegression().fit(X, y)
     
     return reg.score(X, y)
 
-print(modelo(comp))
+print(model(comp))

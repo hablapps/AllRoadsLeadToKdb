@@ -52,20 +52,20 @@ distance_table:select id,estacion:station_index,"F"$string longitud,"F"$string l
 tr:update "I"$string id from 0!traffic;
 td:update "I"$string id from distance_table;
 uni:tr lj 1!td;
-completa:uni lj 2!`fecha`estacion xcols weather;
+complete:uni lj 2!`fecha`estacion xcols weather;
 
 // prepare table for model
-completa:update hour:`hh$fecha,weekday:("d"$fecha)mod 7 from completa;
-completa:3!`hour`weekday`estacion xcols 0^completa;
-cargas:select carga_avg:avg carga by hour,weekday,estacion from completa;
-temps:select temps_avg:avg temperatura by hour from completa;
+complete:update hour:`hh$fecha,weekday:("d"$fecha)mod 7 from complete;
+complete:3!`hour`weekday`estacion xcols 0^complete;
+cargas:select carga_avg:avg carga by hour,weekday,estacion from complete;
+temps:select temps_avg:avg temperatura by hour from complete;
 
-completa:1!0!completa lj cargas;
-completa:update carga:carga-carga_avg,temperatura:temperatura-temps_avg from 0!completa lj temps;
+complete:1!0!complete lj cargas;
+complete:update carga:carga-carga_avg,temperatura:temperatura-temps_avg from 0!complete lj temps;
 
 // use PyKX to run custom model code
-modelfunc:.pykx.get`modelo;
-res:modelfunc[completa];
+modelfunc:.pykx.get`model;
+res:modelfunc[complete];
 
 print res`;
 exit 1;

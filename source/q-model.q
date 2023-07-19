@@ -1,7 +1,71 @@
-system"c 40 200";
+system"c 40 150";
 system"l pykx.q";
-complete:("PJFFFFFFFFFJFJJF";enlist ",")0:`$":../complete.csv";
-final:select from complete where WEEKDAY<5,9<HOUR,HOUR<20;
+
+.pykx.pyexec"import numpy as np";
+.pykx.pyexec"from haversine import haversine_vector, Unit";
+
+
+// data loading
+weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":../dic_meteo22.csv";
+traffic:.Q.id("IPS  J S";enlist ";")0:`$":../12-2022.csv";
+weather_station:.Q.id("SISS";enlist ";")0:`$":../Estaciones_control_datos_meteorologicos.csv";
+traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":../pmed_ubicacion_12-2022.csv";
+
+-1"loaded input data";
+
+weather:(`ANO`MES`DIA`ESTACION`MAGNITUD!`year`month`day`weather_station`magnitude) xcol weather
+
+// preprocess weather data
+weather:`weather_station`date xcols `year`month`day _update date:"D"$(raze')flip(year;month;day) from weather;
+
+cw:cols weather;
+mc:(neg 2*24)_ cw;
+tr:{(flip;enlist,cw where cw like x,"*")};
+
+ops:(mc,`time`magnitude_value`ok)!mc,((#;(count,`i);(enlist;(*;01:00;til,24)));tr"H";tr"V");
+weather:ungroup?[weather;();0b;ops];
+weather:delete from weather where ok<>`V;
+weather:update date:("P"$((string date),'" ",'string"t"$time))from weather;
+weather:update weather_station:"j"$weather_station from weather;
+weather:delete valid,time from weather;
+mag:80 81 82 83 86 87 88 89!`ultraviolet`wind`direction`temperature`humidity`pressure`solar`rainfall;
+weather:update mag magnitude from weather;
+u:value mag;
+weather:0!exec u#magnitude!magnitude_value by date,weather_station from weather;
+weather:0f^weather;
+-1"preprocessed weather table";
+
+weather_station:(`CODIGO_CORTO`LONGITUD`LATITUD!`weather_station`longitude`latitude)xcol weather_station
+traffic_station:(`id`longitud`latitud!`traffic_station`longitude`latitude)xcol traffic_station
+
+-1"preprocessed weather and traffic station data";
+
+traffic:(`fecha`id!`date`traffic_station)xcol traffic;
+traffic:`date xasc select traffic_load:avg carga by date,traffic_station from traffic where error=`N
+-1"preprocessed traffic data";
+
+b:select "F"$string longitude,"F"$string latitude from weather_station;
+a:select "F"$string longitude,"F"$string latitude from traffic_station;
+pow2:xexp[;2];
+/ distance:{[x1;x2;y1;y2;pow2]abs(pow2[x1]-pow2[y1])+abs(pow2[x2]-pow2[y2])}[;;;;pow2];
+/ distance_matrix:distance[b.longitude; b.latitude]'[a.longitude; a.latitude];
+
+.pykx.setdefault"pd";
+.pykx.set[`a;`longitude`latitude#a];
+.pykx.set[`b;`longitude`latitude#b];
+distance_matrix:flip(.pykx.eval"haversine_vector(a, b, Unit.KILOMETERS, comb=True)")`;
+-1"calculated distance matrix";
+
+ids:distance_matrix?'min each distance_matrix;
+
+distance_table:select "I"$string traffic_station,"F"$string weather_station:weather_station[ids][`weather_station] from traffic_station;
+
+complete:(`traffic_station xkey traffic) lj `traffic_station xkey distance_table;
+complete:0!aj[`weather_station`date;complete;weather];
+complete:update hour:`hh$date,weekday:("d"$date)mod 7 from complete;
+-1"built complete table. begin model prep";
+/ complete:("PJFFFFFFFFFJFJJF";enlist ",")0:`$":../complete.csv";
+final:select from complete where weekday>1,9<hour,hour<20;
 final:select from final where 40 <= (avg;traffic_load) fby traffic_station;
 final:update traffic_load:traffic_load%100 from final;
 
@@ -15,11 +79,12 @@ scaledTemperature:minMaxScale final[`temperature];
 
 final[`rainfall]:scaledRainfall;
 final[`temperature]:scaledTemperature;
+-1"preprocessed final table";
 
 time_window:{[tt;data;lb]
     lb:lb+1;
     op:$[tt=`train;#;_];                                      / `train or `test decide the operator
-    m:`rainfall`temperature`traffic_load`HOUR`WEEKDAY;        / the 5 columns we need
+    m:`rainfall`temperature`traffic_load`hour`weekday;        / the 5 columns we need
     data:?[data;();`traffic_station;m!({(y;(-;(count;x);80);x)}[;op]')m]; / first 80 or until the last 80 depending on operator 
     sw:{({y#z _x}[x;5;]')til count b:y _x}[;lb];              / sliding window function. takes turbomatrix and divides into chunks of 5x5
     gl:{y _(flip x)[2]}[;lb];                                  / gets the load (y data)
@@ -44,11 +109,17 @@ show first test[0][3403];
 
 system"l kerasmodel.p";
 
+-1"fit model";
 modelfit:.pykx.get`fit;
 modelfit[train[0][3403];train[1][3403];test[0][3403];test[1][3403]];
 
+-1"predict model";
 modelpredict:.pykx.get`predict;
 res:modelpredict[train[0][3403]];
+
+-1"final result:";
+show res`;
+exit 1;
 
 
 

@@ -41,7 +41,7 @@ traffic_station:(`id`longitud`latitud!`traffic_station`longitude`latitude)xcol t
 -1"preprocessed weather and traffic station data";
 
 traffic:(`fecha`id!`date`traffic_station)xcol traffic;
-traffic:`date xasc select traffic_load:avg carga by date: 0D01:00:00 xbar fecha,traffic_station from traffic where error=`N
+traffic:`date xasc select traffic_load:avg carga by date: 0D01:00:00 xbar date,traffic_station from traffic where error=`N
 -1"preprocessed traffic data";
 
 b:select "F"$string longitude,"F"$string latitude from weather_station;

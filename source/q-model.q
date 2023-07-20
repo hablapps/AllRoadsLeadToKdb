@@ -77,11 +77,10 @@ final:select date, traffic_station, hour, weekday, traffic_load: traffic_load%10
 -1"preprocessed final table";
 
 time_window:{[tt;data;lb]
-    lb:lb+1;
     op:$[tt=`train;#;_];                                      / `train or `test decide the operator
     m:`rainfall`temperature`traffic_load`hour`weekday;        / the 5 columns we need
     data:?[data;();`traffic_station;m!({(y;(-;(count;x);80);x)}[;op]')m]; / first 80 or until the last 80 depending on operator 
-    sw:{({y#z _x}[x;5;]')til count b:y _x}[;lb];              / sliding window function. takes turbomatrix and divides into chunks of 5x5
+    sw:{({y#z _x}[x;lb;]')til count b:(y+1) _x}[;lb];              / sliding window function. takes turbomatrix and divides into chunks of 5x5
     gl:{y _(flip x)[2]}[;lb];                                  / gets the load (y data)
     toMatrix:{({[t;i]value t[i]}[x;]')til count x:flip x};    / table to matrix
     data:(toMatrix')data;                                     / convert each subtable (data is a keyed table) to a matrix

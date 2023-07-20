@@ -41,7 +41,7 @@ traffic_station:(`id`longitud`latitud!`traffic_station`longitude`latitude)xcol t
 -1"preprocessed weather and traffic station data";
 
 traffic:(`fecha`id!`date`traffic_station)xcol traffic;
-traffic:`date xasc select traffic_load:avg carga by date,traffic_station from traffic where error=`N
+traffic:`date xasc select traffic_load:avg carga by date: 0D01:00:00 xbar fecha,traffic_station from traffic where error=`N
 -1"preprocessed traffic data";
 
 b:select "F"$string longitude,"F"$string latitude from weather_station;
@@ -65,20 +65,15 @@ complete:0!aj[`weather_station`date;complete;weather];
 complete:update hour:`hh$date,weekday:("d"$date)mod 7 from complete;
 -1"built complete table. begin model prep";
 / complete:("PJFFFFFFFFFJFJJF";enlist ",")0:`$":../complete.csv";
-final:select from complete where weekday>1,9<hour,hour<20;
-final:select from final where 40 <= (avg;traffic_load) fby traffic_station;
-final:update traffic_load:traffic_load%100 from final;
-
 minMaxScale:{[l]
     minL:min l;
     maxL:max l;
     ({(x-y)%(z-y)}[;minL;maxL]')l};
 
-scaledRainfall:minMaxScale final[`rainfall];
-scaledTemperature:minMaxScale final[`temperature];
+final:select date, traffic_station, hour, weekday, traffic_load: traffic_load%100, temperature:minMaxScale temperature, rainfall:minMaxScale rainfall 
+	from complete
+	where weekday>1,9<hour,hour<20, 40 <= (avg; traffic_load) fby traffic_station;
 
-final[`rainfall]:scaledRainfall;
-final[`temperature]:scaledTemperature;
 -1"preprocessed final table";
 
 time_window:{[tt;data;lb]

@@ -1,59 +1,44 @@
-# All Roads Lead to Kdb: a PyKX tale
+# All Roads Lead to Kdb: A Python to Production tale
 
-Introducing Emma Monad, the main character of our story and CTO of Mad Flow, a
-large and fictional company dedicated to improving the quality of life in
-Madrid. Emma was facing the real-world challenge of tackling the issue of heavy
-traffic in the city. However, she found herself grappling with an unfortunate
-hurdle —an outdated and inflexible legacy data infrastructure within Mad Flow.
-This rigid and sluggish platform was hindering the practical analysis of traffic
-data, making it difficult to derive meaningful insights and develop effective
-solutions. Emma had to navigate this obstacle to unlock the true potential of
-Mad Flow and fulfill its mission of transforming Madrid into a more livable and
-efficient city.
+Introducing Emma Monad, the main character of our story and CTO of Mad Flow, a large and fictional company dedicated to improving the quality of life in Madrid. Emma was facing the real-world challenge of tackling the issue of heavy traffic in the city. However, she found herself grappling with an outdated, ad-hoc constructed, somewhat
+inflexible, though open data and analytics Mad Flow infrastructure stack. It was a code base that incorporated various modules developed over time, by in-house data science, engineering and developer teams with the help of occasional interns from the nearby university. The application was predominantly built in Python, the most popular programming language of data science over the last decade.
 
+However, there were problems with the infrastructure. While open and customizable, it suffered with chaotic organization and frequent performance issues, meaning it was slow and unwieldy when incorporating new traffic data-sets or building new insights
+quickly. This combined to hinder their ability to define and progress effective transport solutions for the city. Emma wanted to take the greatness of the Mad Flow code base, unlock its true potential, and help fulfil its and their mission of transforming Madrid into a morepleasant, efficient and environmentally friendly city.
 
-Emma had heard about the advantages of q/Kdb+ by KX: an extremely fast and
-flexible platform. Nevertheless, she had serious concerns about taking the leap.
-Firstly, she was aware that Q had a reputation for having a steep learning
-curve. Secondly, Mad Flow was heavily reliant on the Python environment, making
-it impractical to migrate the entire existing codebase. After several months of
-internal struggles, she came across PyKX, an open-source library that was
-designed to facilitate the integration between Q and Python. Having this option
-was crucial in making the decision to adopt q/kdb+. As time proved, PyKX became
-indispensable in guiding the team through every stage of the migration process.
-The rest of this story tells you why.
+Emma thus wanted more agile data management and effective production-ready analytics easily deployed. She had heard, via some occasional consultants to her organization, about a popular and seemingly blindingly fast time-series database and analytics platform called kdb. Nevertheless, that was not for her she felt. Her team’s
+comfort was in Python, the language that Mad Flow was predominantly written in, and it was simply impractical to build in anything else, so Python it was. However, at a local PyData Meetup Emma attended, a data scientist acquaintance told her over drinks about PyKX, an open-source library allowing Python to remain the guiding language, but harnessing the power of kdb at runtime. She decided to give it a try, and as time proved, PyKX just worked, and was indispensable in guiding the team from taking a predominantly ad-hoc research data and analytics codebase into a production powerhouse.
 
-## Chapter 1: Any Q Programmer in the Room?
+The rest of this story tells you how and why.
 
-Setting up the kdb+ platform and ingesting the traffic data required several
-weeks. Emma wished this process could have taken forever, as she was
-apprehensive about the moment of starting. However, there she was, with a
-skilled Python team that had no prior experience in writing even a simple "Hello
-World" in Q (which, by the way, is `0N!"Hello World!"`), and a Python REPL
-waiting for instructions. She tried to conceal her fear, and she typed the very
-first line of PyKX code in the Python shell:
+## Chapter 1: I just want to stay in Python
+
+Setting up kdb to ingest and visualize the traffic data, Emma feared, might require several weeks. Somewhat apprehensively, Emma wished this process could take forever and set expectations with her team accordingly. However, she surprised everyone by quickly invoking a simple "Hello World" in the vector-based functional q language which underpins kdb (which, by the way, is `0N!"Hello World!"`), and get the
+environment accessed from a Python REPL waiting for instructions. She typed the very first line of PyKX code in the Python shell:
+
 ```python
 >>> import pykx as kx
 ```
-A sense of calm washed over her as she saw that everything was going well.
 
-Madrid has many traffic devices scattered throughout the city, so the first task
-was to retrieve their information from the new platform. According to the
-documentation, this information was stored in the `tdevice` q table. She could
-also see the instruction that created the table from a _CSV_ file:
+A sense of calm washed over her as she saw that everything was going well. The hello world was very quickly achieved.
+
+Madrid has many traffic devices scattered throughout the city, so her first task was to retrieve their information from the new platform. According to the documentation, this information was stored in the `tdevice` q table. She could also see the instruction that
+created the table from a _CSV_ file:
+
 ```q
 tdevice:("SII**FFFF";enlist";")0:`$":pmed_location_04-2023.csv"
 ```
-"What the hell?" she thought, and she decided to return to the Python shell
-where she felt safe once again.
 
-As mentioned in the PyKX user guide, `kx.q` was all she needed to execute
-commands against the unfamiliar _q_ world. With little confidence, she decided
-to do the obvious:
+"What the hell?" she thought, and she decided to return to the familiar Python shell.
+
+But it was actually pretty simple. As the PyKX user guide made clear, `kx.q` was all she needed to execute commands, so she decided to try the obvious:
+
 ```python
 >>> tdevice = kx.q('tdevice')
 ```
-To her surprise, a collection of familiar data appeared on the screen:
+
+To her surprise and delight, a collection of familiar data appeared on the screen:
+
 ```q
 pykx.Table(pykx.q('
 elem_type district id    cod_dis name                                     ..
@@ -66,8 +51,9 @@ URB       4        3844  "01005"  "(AFOROS) Pº Castellana S-N  - Eduar..
 ..
 '))
 ```
-Taking advantage of her lucky streak, she set out to play again, this time using
-the pandas notation to retrieve a few columns from the table:
+
+Her team had long familiarity with Pandas notation, so she tried some pandas instructions to retrieve a few columns from the table. It worked, all really easily, or so it seemed:
+
 ```python
 >>> tdevice[['district', 'id', 'latitude', 'longitude']]
 pykx.List(pykx.q('
@@ -77,14 +63,11 @@ pykx.List(pykx.q('
 -3.688323 -3.687256 -3.691727 -3.691929 -3.68847 -3.690991 -3.698403 -3.69455..
 '))
 ```
-"Yikes!" It was so close, but "Where are my columns?" she thought. It no longer
-looked like a dataframe.
 
-Unfortunately, she didn't have the time to comprehend what was happening as she
-had confidently asserted that she could run any given analytics algorithm on the
-new platform from day one, despite skepticism from many. Why was Emma so
-certain? Because she knew she could seamlessly adapt any q-world dataframe-like
-object into Python by transforming it into pandas by means of `pd`:
+"Yikes!" It was so close, but it didn’t look like a dataframe. "Where are my columns?" she thought.
+
+That wouldn’t impress her colleagues, for whom familiar columns mattered. If this was to be a barrier, then it would likely be even harder to run the required analytics algorithms on the proposed new platform. But the documentation suggested the `pd`command which just worked:
+
 ```python
 >>> tdevice.pd()[['district', 'id', 'longitude', 'latitude']]
       distrito    id  longitud    latitud
@@ -95,33 +78,21 @@ object into Python by transforming it into pandas by means of `pd`:
 4741        16  6933 -3.672497  40.484118
 4742        16  7129 -3.672500  40.484181
 4743        16  7015 -3.672308  40.485002
-
 [4744 rows x 4 columns]
 ```
-Et voilà! Emma simply had to repeat the process to load the remaining dataframes
-used by the algorithm, and she was able to execute the program smoothly. She had
-intentionally selected an algorithm that produced output in the form of CSV
-files because she knew she wasn't ready to reintegrate the results into the q
-world just yet. Nonetheless, this marked a significant milestone. Emma saved the
-day! However, she was well aware that there was still a long road ahead of her.
+
+Et voilà! Emma simply had to repeat the process to load the remaining dataframes used by the algorithm, and she could execute the program smoothly. She had intentionally selected an algorithm that produced output in the form of familiar CSV file standards because that was what she and her team knew, but her PyData and kdb-knowledgeable fellow attendee had told her that kdb data stores were so much more
+efficient. For now, though, she’d stay with csv. Nonetheless, this marked a significant milestone. Emma had already felt that some of the initial promises were delivered!  However, she was well aware of the long road ahead of her if she was to bring along her team and make Mad Flow the agile production analytics platform she wanted it to be.
 
 ## Chapter 2: From Zero to Hero
 
-Several weeks had passed since day zero, and she finally found time to conduct 
-more research on PyKX. "Do as little work as necessary," she murmured. "Let q do 
-the heavy lifting!" Emma repeated these mantras from the PyKX user guide to herself 
-whenever she was tempted to use `pd`. She was now well aware that in order to fully 
-harness the platform's potential, she should minimize data transfers between the 
-realms of Q and Python, and delegate as much work as possible to the kdb infrastructure.
+Several weeks passed, and, having onboarded a couple of data scientist interns, she finally found time to work with them and conduct more research on PyKX. "Do as little work as necessary," she murmured. "I just want my team to work with what they’re comfortable with, but have kdb do the heavy lifting!" Emma repeated these mantras from the PyKX user guide to herself whenever she was tempted to use `pd`. However,
+she was now well aware that in order to fully harness the platform's potential, she should minimize data transfers between the two realms, and delegate as much work as possible to the kdb infrastructure.
 
-The key to achieving these goals was closely related to harnessing the full potential 
-of the PyKX object API, which served as the foundation of the Python-first approach 
-promoted by PyKX. This API facilitated a seamless embedding of q/kdb+ within Python, 
-enabling direct usage of Q functions in Python code. This enhanced the development 
-experience and minimized the chances of errors. 
+The key to achieving these goals was in harnessing the full potential of the PyKX object API, allowing a Python-first approach. This API facilitated the seamless embedding of q/kdb within Python, enabling direct use of efficient q functions in Python code. If practical, this would enhance the development experience, minimize the chances of
+errors and, the team hoped, dramatically improve performance.
 
-Emma issued her first `qsql` query in a full-blown Pythonic style through the 
-PyKX qSQL API:
+Emma thus issued her first `qsql` query in a full-blown Pythonic style using the API:
 
 ```python
 >>> kx.q.qsql.select(tdevice, columns = ['district', 'id', 'longitude', 'latitude'])
@@ -137,29 +108,19 @@ distrito id    longitud  latitud
 '))
 ```
 
-By pushing the query down into the q realm in this manner, she effectively circumvented 
-the need to convert the entire data from the Q table into pandas. "Do as little work 
-as necessary?" Nailed it!
+By pushing the query straight down into the q realm, there was now no need to convert the entire data into Pandas. "Do as little work as necessary?" Nailed it!
 
-She also found this mantra quite useful not only for reading from existing tables but 
-also for creating new ones. In fact, she soon encountered the need to import a CSV file 
-containing static data. Rather than importing it into a Pandas dataframe and then 
-converting it into a Q table, she efficiently handled the task using the readily 
-available `pykx.read` attribute. This function seamlessly brings the functionality of 
-the corresponding Q keyword into Python, thus avoiding any kind of conversion altogether:
+She also found this mantra quite useful, not only for reading from existing tables but also when creating new ones. In fact, she soon encountered the need to import a CSV file containing static data. Rather than importing it into a Pandas dataframe and then
+converting it into a q table, she simply used the `pykx.read` attribute which brings the functionality of the corresponding q keyword into Python, thus avoiding any kind of conversion altogether:
 
 ```python
 distrito = kx.q.read.csv("Districts.csv", types = "JFFJJSSS", delimiter=";", as_table=True)
 ```
 
-However, Emma eventually faced a seemingly significant challenge, as she progressed in her
-desire to fully leverage the power of Q from within Python: the absence of equivalent 
-attributes for operators like `cast`, `drop`, and `exec`, among others. She soon recognized that the 
-Pythonic style was mainly geared towards q keyword functions. As `cast`, `drop`, and 
-`exec` were operators rather than q functions of its standard library, she needed 
-to explore alternative methods for incorporating Q code within Python. 
+However, Emma faced challenges. She noticed the absence of equivalent attributes for operators like `cast`, `drop`, and `exec`, among others, appreciating that the Pythonic style was mainly geared towards q keyword functions. As `cast`, `drop`, and `exec` were operators rather than standard q functions, she needed to explore alternative
+methods to maintain their Python familiarity.
 
-To her surprise, she discovered that a remarkably straightforward solution existed!
+Yet it proved remarkably straightforward!
 
 ```python
 >>> kx.q('select district,id,longitude,latitude from tdevice')
@@ -175,24 +136,15 @@ distrito id    longitud  latitud
 '))
 ```
 
-As an experienced programmer, she was well aware that using strings to represent
-expressions might not be the most optimal approach. It could lead to errors,
-vulnerabilities, and a lack of support from the IDE. So, she would recommend to her teams
-the Pythonic style whenever possible.
+As an experienced programmer, she was well aware that using strings to represent expressions might not be the most optimal approach. It could lead to errors, vulnerabilities, and a lack of support from the IDE. So, she would recommend to her teams the Pythonic style whenever possible.
 
 ## Chapter 3: Putting the World Upside Down
 
-Eventually, Emma's growing appreciation for and learning of the q/kdb+ language naturally led her
-to leverage the q/kdb+ environment directly, rather than relying on Python. However, she didn't want 
-to forget about Python either, since her codebase contained many useful Python functions that were 
-worth reusing. Fortunately, the PyKX environment provided just this very same functionality, allowing
-to execute and eval Python code from within a q session. 
+Eventually, Emma's growing appreciation for and excitement in learning about the q/kdb language encouraged her to increasingly try to adopt it directly. However, her colleagues and new hires all knew – and loved – Python as did she, and her codebase contained many useful reusable Python functions. Fortunately, it was straightforward to execute and eval Python code from within her q session.
 
-Emma started to think of PyKX as a gift specially made for her by the Three Wise Men.
+Emma started to think of PyKX as a gift specially made for her by the Three Wise Men. It truly offered the best of both worlds, the flexibility and familiarity of Python and the sheer power and efficiency of q/kdb.
 
-She decided to make her first attempt using a custom-made Python function called `cdist`, which she was 
-too lazy to migrate to Q at the moment. Without any trouble, she opened a Q console and typed the 
-expected commands to import the necessary libraries:
+She made her first attempt using a custom-made Python function called `cdist`, which she had no immediate need to migrate away from Python. From her q console, she typed the expected commands to import the necessary libraries:
 
 ```q
 q) system"l pykx.q";
@@ -200,8 +152,7 @@ q) .pykx.pyexec"import numpy as np";
 q) .pykx.pyexec"from scipy.spatial.distance import cdist";
 ```
 
-The function `cdist` required several arguments, and Emma opted for a straightforward approach by 
-creating new Python variables that referenced Q native tables `a` and `b`:
+The function `cdist` required several arguments, and Emma simply created new Python variables that referenced q native tables `a` and `b`:
 
 ```python
 .pykx.set[`xa1;a[`longitude]];
@@ -210,18 +161,13 @@ creating new Python variables that referenced Q native tables `a` and `b`:
 .pykx.set[`yb2;b[`LATITUDE]];
 ```
 
-Calling the function now simply involved evaluating the corresponding Python code and converting 
-the resulting data back to Q (using the backtick `):
+Calling the function now simply involved evaluating the corresponding Python code and converting the resulting data back to q (using the backtick `):
 
 ```python
 distance_matrix:flip(.pykx.eval"cdist(np.dstack((yb1,yb2))[0], np.dstack((xa1,xa2))[0])")`;
 ```
 
-Alongside her own Python codebase, Mad Flow leveraged highly valuable libraries from the Python 
-ecosystem, such as `sklearn`. "I'm confident that the Q ecosystem also offers similar ML libraries," 
-she thought. And she was correct! However, she was also aware that her teams were already familiar 
-with sklearn and would greatly appreciate the ability to reuse existing Python scripts, like the 
-following one, without modifications:
+Alongside her own Python codebase, Mad Flow leveraged highly valuable and popular libraries from the Python ecosystem, such as sci-kit learn (`sklearn`) for statistical and machine learning. "Perhaps the q ecosystem also offers similar ML libraries?" she rightly thought. However, her teams familiarity with – and trust in - sklearn was irresistible, so they simply wanted to reuse their existing Python scripts, like the following, without modifications:
 
 ```python
 from sklearn.linear_model import LinearRegression
@@ -235,33 +181,20 @@ def model(table):
     return reg.score(X, y)
 ```
 
-This time, she took a different approach to invoke the `model` function. She retrieved it into a 
-PyKX object within the Q space using `pykx.get` and utilized the PyKX function-call interface:
+This time, though, she took a different approach to invoke the `model` function. She retrieved it into a PyKX object within the q space using `pykx.get` and utilized the PyKX function-call interface:
 
 ```q
 modelfunc:.pykx.get`model;
 res:modelfunc[data];
 print res`;
-``` 
+```
 
 ## Conclusions
 
-As an experienced CTO, Emma was particularly aware of the trade-offs that new technologies pose to complex
-organizations like Mad Flow. On one hand, state-of-the-art technologies like q/kdb+ promise enormous 
-benefits in terms of performance, efficiency, and the accompanying cost reductions of modern cloud-based
-infrastructures. On the other hand, team culture could hinder these advantages if technologists are unable
-to adopt the new technology at the same pace. Emma specially appreciated PyKX in this regard: as a
-Python-driven organization, her teams couldn't be happier with the opportunity to maintain their
-programming environment of choice. Moreover, PyKX simplifies the process of transitioning to q/kdb+, 
-making it easier for teams to embrace the new technology.
+As a CTO managing a talented yet pressured team, Emma was particularly aware of the trade-offs that introducing new technologies posed to Mad Flow. On one hand, state-of-the-art technologies promise enormous performance, efficiency, and infrastructure cost reductions. On the other hand, team culture and the overwhelming comfort and appreciation of community tools, such as Python, could hinder these advantages if
+technologists just want to stick with their preferred tools. Emma therefore especially appreciated PyKX as a vehicle to bring production capabilities into a Python-friendly organization, and those who influenced the codebase from the Python community at large. Her teams couldn't have been happier with the result. They could maintain and
+enhance their programming environment of choice, but swiftly transition onerous tasks to q/kdb.
 
-Furthermore, PyKX enabled Emma to avoid the "with me or against me" mentality. She wasn't compelled to 
-completely abandon Python but rather gradually replace and deploy critical components that required better
-performance into the new q/kdb+ environment. In fact, she soon appointed three of their top architects,
-Félix, Jesús, and Eloy, as team leads for three different teams responsible for various roles within the
-Mad Flow ecosystem utilizing the new q/kdb+ infrastructure. These appointments align with the three different
-use cases for the PyKX library described in this post.
+Thus PyKX allowed Emma to avoid the "with me or against me" mentality that comes with change. There was no unpopular abandonment of Python, far from it. Instead Python took on new meaning as it became the vehicle to steer more analytics into production and make those already in production much more perform. In fact, she soon appointed three of their top architects, Félix, Jesús, and Eloy, as team leads for three different teams responsible for various roles within the Mad Flow ecosystem utilizing the new infrastructure. These appointments align with the three different use cases for the PyKX library described in this post.
 
-Stay tuned for the follow-up to this post, where Félix, Jesús, and Eloy will elaborate on the use case 
-of heavy traffic and the utilization of PyKX!
-
+Stay tuned for the follow-up to this post, where Félix, Jesús, and Eloy will elaborate on the use case of heavy traffic and the utilization of PyKX!

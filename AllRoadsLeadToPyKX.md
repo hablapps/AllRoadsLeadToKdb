@@ -1,7 +1,7 @@
 # All Roads Lead to Kdb: A Python to Production tale
 
 Introducing Emma Monad, the main character of our story and CTO of Mad Flow, a large and fictional company dedicated to improving the quality of life in Madrid. Emma was facing the real-world challenge of tackling the issue of heavy traffic in the city. However, she found herself grappling with an outdated, ad-hoc constructed, somewhat
-inflexible, though open data and analytics Mad Flow infrastructure stack. It was a code base that incorporated various modules developed over time, by in-house data science, engineering and developer teams with the help of occasional interns from the nearby university. The application was predominantly built in Python, the most popular programming language of data science over the last decade.
+inflexible, Mad Flow infrastructure stack. It was a code base that incorporated various modules developed over time, by in-house data science, engineering and developer teams with the help of occasional interns from the nearby university. The application was predominantly built in Python, the most popular programming language of data science over the last decade.
 
 However, there were problems with the infrastructure. While open and customizable, it suffered with chaotic organization and frequent performance issues, meaning it was slow and unwieldy when incorporating new traffic data-sets or building new insights
 quickly. This combined to hinder their ability to define and progress effective transport solutions for the city. Emma wanted to take the greatness of the Mad Flow code base, unlock its true potential, and help fulfil its and their mission of transforming Madrid into a morepleasant, efficient and environmentally friendly city.
@@ -13,14 +13,17 @@ The rest of this story tells you how and why.
 
 ## Chapter 1: I just want to stay in Python
 
-Setting up kdb to ingest and visualize the traffic data, Emma feared, might require several weeks. Somewhat apprehensively, Emma wished this process could take forever and set expectations with her team accordingly. However, she surprised everyone by quickly invoking a simple "Hello World" in the vector-based functional q language which underpins kdb (which, by the way, is `0N!"Hello World!"`), and get the
-environment accessed from a Python REPL waiting for instructions. She typed the very first line of PyKX code in the Python shell:
+Setting up kdb to ingest the traffic data, Emma feared, might require several weeks. Somewhat apprehensively, Emma set expectations with her team accordingly. However, there she was, much sooner than expected, with a skilled Python
+team that had no prior experience in writing even a simple “Hello World” in Q
+(which, by the way, is 0N!"Hello World!"), and a Python REPL waiting for
+instructions. She tried to conceal her fear, and she typed the very first line of
+PyKX code in the Python shell:
 
 ```python
 >>> import pykx as kx
 ```
 
-A sense of calm washed over her as she saw that everything was going well. The hello world was very quickly achieved.
+A sense of calm washed over her as she saw that everything was going well.
 
 Madrid has many traffic devices scattered throughout the city, so her first task was to retrieve their information from the new platform. According to the documentation, this information was stored in the `tdevice` q table. She could also see the instruction that
 created the table from a _CSV_ file:
@@ -81,16 +84,30 @@ That wouldn’t impress her colleagues, for whom familiar columns mattered. If t
 [4744 rows x 4 columns]
 ```
 
-Et voilà! Emma simply had to repeat the process to load the remaining dataframes used by the algorithm, and she could execute the program smoothly. She had intentionally selected an algorithm that produced output in the form of familiar CSV file standards because that was what she and her team knew, but her PyData and kdb-knowledgeable fellow attendee had told her that kdb data stores were so much more
-efficient. For now, though, she’d stay with csv. Nonetheless, this marked a significant milestone. Emma had already felt that some of the initial promises were delivered!  However, she was well aware of the long road ahead of her if she was to bring along her team and make Mad Flow the agile production analytics platform she wanted it to be.
+Et voilà! Emma simply had to repeat the process to load the remaining dataframes used by the selected algorithm, and she could execute the program smoothly, in its very original form. She had intentionally choose an algorithm that produced output in the form of familiar CSV file standards because that was what she and her team knew, but her PyData and kdb-knowledgeable fellow attendee had told her that kdb data stores were so much more efficient. For now, though, she’d stay with csv. Nonetheless, this marked a significant milestone. Emma had already felt that some of the initial promises were delivered!  However, she was well aware of the long road ahead of her if she was to bring along her team and make Mad Flow the agile production analytics platform she wanted it to be.
 
 ## Chapter 2: From Zero to Hero
 
-Several weeks passed, and, having onboarded a couple of data scientist interns, she finally found time to work with them and conduct more research on PyKX. "Do as little work as necessary," she murmured. "I just want my team to work with what they’re comfortable with, but have kdb do the heavy lifting!" Emma repeated these mantras from the PyKX user guide to herself whenever she was tempted to use `pd`. However,
+Several weeks passed, and, having onboarded a couple of data scientist interns, she finally found time to work with them and conduct more research on PyKX. "Do as little work as necessary," she murmured. "I just want my team to work with what they’re comfortable with, but have kdb do the heavy lifting!" Emma repeated these mantras from the PyKX user guide to herself whenever she was tempted to use `pd`. Indeed,
 she was now well aware that in order to fully harness the platform's potential, she should minimize data transfers between the two realms, and delegate as much work as possible to the kdb infrastructure.
 
-The key to achieving these goals was in harnessing the full potential of the PyKX object API, allowing a Python-first approach. This API facilitated the seamless embedding of q/kdb within Python, enabling direct use of efficient q functions in Python code. If practical, this would enhance the development experience, minimize the chances of
-errors and, the team hoped, dramatically improve performance.
+The key to achieving these goals was in leveraging the PyKX object API, allowing a Python-first approach. This API facilitated the seamless embedding of q/kdb within Python, enabling direct use of efficient q functions in Python code. Moreover, it also provided convenient re-implementations of Pythonic APIs, such as the Pandas APIs, which elliminated the need for converting to Pandas in many cases. If practical, this would enhance the development experience, minimize the chances of errors and, the team hoped, dramatically improve performance.
+
+<< Pandas API example >> 
+
+```python
+traffic = traffic.loc[traffic["error"] == "N"].rename(columns={"carga":"load", 
+"id":"traffic_station",
+ "fecha":"date"})
+traffic.drop(["tipo_elem", 
+"error", 
+"periodo_integracion", 
+"intensidad", 
+"ocupacion", 
+"vmed"], axis=1).mode(dropna=True)
+```
+
+
 
 Emma thus issued her first `qsql` query in a full-blown Pythonic style using the API:
 
@@ -118,9 +135,7 @@ distrito = kx.q.read.csv("Districts.csv", types = "JFFJJSSS", delimiter=";", as_
 ```
 
 However, Emma faced challenges. She noticed the absence of equivalent attributes for operators like `cast`, `drop`, and `exec`, among others, appreciating that the Pythonic style was mainly geared towards q keyword functions. As `cast`, `drop`, and `exec` were operators rather than standard q functions, she needed to explore alternative
-methods to maintain their Python familiarity.
-
-Yet it proved remarkably straightforward!
+methods to maintain their Python familiarity. Yet it proved remarkably straightforward!
 
 ```python
 >>> kx.q('select district,id,longitude,latitude from tdevice')

@@ -1,15 +1,14 @@
 system"c 40 150";
 system"l pykx.q";
 
-.pykx.pyexec"import numpy as np";
 .pykx.pyexec"from haversine import haversine_vector, Unit";
 
 
 // data loading
-weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":../dic_meteo22.csv";
-traffic:.Q.id("IPS  J S";enlist ";")0:`$":../12-2022.csv";
-weather_station:.Q.id("SISS";enlist ";")0:`$":../Estaciones_control_datos_meteorologicos.csv";
-traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":../pmed_ubicacion_12-2022.csv";
+weather:.Q.id("  II ***",(24*2)#"FS";enlist ";")0:`$":../../dic_meteo22.csv";
+traffic:.Q.id("IPS  J S";enlist ";")0:`$":../../12-2022.csv";
+weather_station:.Q.id("SISS";enlist ";")0:`$":../../Estaciones_control_datos_meteorologicos.csv";
+traffic_station:.Q.id("SISSSSSSS";enlist ";")0:`$":../../pmed_ubicacion_12-2022.csv";
 
 -1"loaded input data";
 
@@ -70,9 +69,15 @@ minMaxScale:{[l]
     maxL:max l;
     ({(x-y)%(z-y)}[;minL;maxL]')l};
 
-final:select date, traffic_station, hour, weekday, traffic_load: traffic_load%100, temperature:minMaxScale temperature, rainfall:minMaxScale rainfall 
-	from complete
-	where weekday>1,9<hour,hour<20, 40 <= (avg; traffic_load) fby traffic_station;
+final:select date, traffic_station, hour, weekday,
+             traffic_load: traffic_load%100,
+             temperature:minMaxScale temperature,
+             rainfall:minMaxScale rainfall 
+      from complete
+      where weekday>1,
+            9<hour,
+            hour<20,
+            40 <= (avg; traffic_load) fby traffic_station;
 
 -1"preprocessed final table";
 
@@ -80,8 +85,8 @@ time_window:{[tt;data;lb]
     op:$[tt=`train;#;_];                                      / `train or `test decide the operator
     m:`rainfall`temperature`traffic_load`hour`weekday;        / the 5 columns we need
     data:?[data;();`traffic_station;m!({(y;(-;(count;x);80);x)}[;op]')m]; / first 80 or until the last 80 depending on operator 
-    sw:{({y#z _x}[x;lb;]')til count b:(y+1) _x}[;lb];              / sliding window function. takes turbomatrix and divides into chunks of 5x5
-    gl:{y _(flip x)[2]}[;lb];                                  / gets the load (y data)
+    sw:{({y#z _x}[x;y;]')til count b:(y+1) _x}[;lb];          / sliding window function. takes the matrix and divides into chunks of 5x5
+    gl:{(y+1) _(flip x)[2]}[;lb];                             / gets the load (y data)
     toMatrix:{({[t;i]value t[i]}[x;]')til count x:flip x};    / table to matrix
     data:(toMatrix')data;                                     / convert each subtable (data is a keyed table) to a matrix
     X:(sw')data;                                              / apply sliding window to get X

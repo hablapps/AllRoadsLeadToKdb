@@ -4,7 +4,7 @@ Introducing Emma Monad, the main character of our story and CTO of Mad Flow, a l
 inflexible, Mad Flow infrastructure stack. It was a code base that incorporated various modules developed over time, by in-house data science, engineering and developer teams with the help of occasional interns from the nearby university. The application was predominantly built in Python, the most popular programming language of data science over the last decade.
 
 However, there were problems with the infrastructure. While open and customizable, it suffered with chaotic organization and frequent performance issues, meaning it was slow and unwieldy when incorporating new traffic data-sets or building new insights
-quickly. This combined to hinder their ability to define and progress effective transport solutions for the city. Emma wanted to take the greatness of the Mad Flow code base, unlock its true potential, and help fulfil its and their mission of transforming Madrid into a morepleasant, efficient and environmentally friendly city.
+quickly. This combined to hinder their ability to define and progress effective transport solutions for the city. Emma wanted to take the greatness of the Mad Flow code base, unlock its true potential, and help fulfil its and their mission of transforming Madrid into a more pleasant, efficient and environmentally friendly city.
 
 Emma thus wanted more agile data management and effective production-ready analytics easily deployed. She had heard, via some occasional consultants to her organization, about a popular and seemingly blindingly fast time-series database and analytics platform called kdb. Nevertheless, that was not for her she felt. Her team’s
 comfort was in Python, the language that Mad Flow was predominantly written in, and it was simply impractical to build in anything else, so Python it was. However, at a local PyData Meetup Emma attended, a data scientist acquaintance told her over drinks about PyKX, an open-source library allowing Python to remain the guiding language, but harnessing the power of kdb at runtime. She decided to give it a try, and as time proved, PyKX just worked, and was indispensable in guiding the team from taking a predominantly ad-hoc research data and analytics codebase into a production powerhouse.
@@ -13,11 +13,7 @@ The rest of this story tells you how and why.
 
 ## Chapter 1: I just want to stay in Python
 
-Setting up kdb to ingest the traffic data, Emma feared, might require several weeks. Somewhat apprehensively, Emma set expectations with her team accordingly. However, there she was, much sooner than expected, with a skilled Python
-team that had no prior experience in writing even a simple “Hello World” in Q
-(which, by the way, is 0N!"Hello World!"), and a Python REPL waiting for
-instructions. She tried to conceal her fear, and she typed the very first line of
-PyKX code in the Python shell:
+Setting up kdb to ingest the traffic data, Emma feared, might require several weeks. Somewhat apprehensively, Emma set expectations with her team accordingly. However, there she was, with a skilled Python team that had no prior experience in writing even a simple “Hello World” in Q (which, by the way, is 0N!"Hello World!"), and a Python REPL waiting for instructions. She tried to conceal her fear, and she typed the very first line of PyKX code in the Python shell:
 
 ```python
 >>> import pykx as kx
@@ -25,40 +21,16 @@ PyKX code in the Python shell:
 
 A sense of calm washed over her as she saw that everything was going well.
 
-Madrid has many traffic devices scattered throughout the city, so her first task was to retrieve their information from the new platform. According to the documentation, this information was stored in the `tdevice` q table. She could also see the instruction that
-created the table from a _CSV_ file:
-
-```q
-tdevice:("SII**FFFF";enlist";")0:`$":pmed_location_04-2023.csv"
-```
-
-"What the hell?" she thought, and she decided to return to the familiar Python shell.
-
-But it was actually pretty simple. As the PyKX user guide made clear, `kx.q` was all she needed to execute commands, so she decided to try the obvious:
+Madrid has many traffic devices scattered throughout the city, so her first task was to retrieve their information, available in several .csv files, into the new platform. According to the PyKX documentation, the  `pykx.read` attribute seemed to be her best option:
 
 ```python
->>> tdevice = kx.q('tdevice')
+tdevices = kx.q.read.csv("devices.csv", types = "JFFJJSSS", delimiter=";", as_table=True)
 ```
 
-To her surprise and delight, a collection of familiar data appeared on the screen:
-
-```q
-pykx.Table(pykx.q('
-elem_type district id    cod_dis name                                     ..
------------------------------------------------------------------------------..
-URB       4        3840  "01001"  "Jose Ortega y Gasset E-O - Pº Caste..
-URB       4        3841  "01002"  "Jose Ortega y Gasset O-E - Serrano-Pº..
-URB       1        3842  "01003"  "Pº Recoletos N-S - Almirante-Prim" ..
-URB       4        3843  "01004"  "Pº Recoletos S-N - Pl. Cibeles- Rec..
-URB       4        3844  "01005"  "(AFOROS) Pº Castellana S-N  - Eduar..
-..
-'))
-```
-
-Her team had long familiarity with Pandas notation, so she tried some pandas instructions to retrieve a few columns from the table. It worked, all really easily, or so it seemed:
+Her team had extensive familiarity with Pandas notation, so she decided to try some Pandas instructions to retrieve a few columns from the table. It worked effortlessly, or at least it seemed so at first.
 
 ```python
->>> tdevice[['district', 'id', 'latitude', 'longitude']]
+>>> tdevices[['district', 'id', 'latitude', 'longitude']]
 pykx.List(pykx.q('
 4         4         1         4         4        4         1         7       ..
 3840      3841      3842      3843      3844     3845      3846      3847    ..
@@ -72,15 +44,15 @@ pykx.List(pykx.q('
 That wouldn’t impress her colleagues, for whom familiar columns mattered. If this was to be a barrier, then it would likely be even harder to run the required analytics algorithms on the proposed new platform. But the documentation suggested the `pd`command which just worked:
 
 ```python
->>> tdevice.pd()[['district', 'id', 'longitude', 'latitude']]
-      distrito    id  longitud    latitud
-0            4  3840 -3.688323  40.430502
-1            4  3841 -3.687256  40.430524
-2            1  3842 -3.691727  40.422132
-...        ...   ...       ...        ...
-4741        16  6933 -3.672497  40.484118
-4742        16  7129 -3.672500  40.484181
-4743        16  7015 -3.672308  40.485002
+>>> tdevices.pd()[['district', 'id', 'longitude', 'latitude']]
+      district    id  longitude   latitude
+0            4  3840  -3.688323  40.430502
+1            4  3841  -3.687256  40.430524
+2            1  3842  -3.691727  40.422132
+...        ...   ...        ...        ...
+4741        16  6933  -3.672497  40.484118
+4742        16  7129  -3.672500  40.484181
+4743        16  7015  -3.672308  40.485002
 [4744 rows x 4 columns]
 ```
 
@@ -91,67 +63,86 @@ Et voilà! Emma simply had to repeat the process to load the remaining dataframe
 Several weeks passed, and, having onboarded a couple of data scientist interns, she finally found time to work with them and conduct more research on PyKX. "Do as little work as necessary," she murmured. "I just want my team to work with what they’re comfortable with, but have kdb do the heavy lifting!" Emma repeated these mantras from the PyKX user guide to herself whenever she was tempted to use `pd`. Indeed,
 she was now well aware that in order to fully harness the platform's potential, she should minimize data transfers between the two realms, and delegate as much work as possible to the kdb infrastructure.
 
-The key to achieving these goals was in leveraging the PyKX object API, allowing a Python-first approach. This API facilitated the seamless embedding of q/kdb within Python, enabling direct use of efficient q functions in Python code. Moreover, it also provided convenient re-implementations of Pythonic APIs, such as the Pandas APIs, which elliminated the need for converting to Pandas in many cases. If practical, this would enhance the development experience, minimize the chances of errors and, the team hoped, dramatically improve performance.
+The key to achieving these goals lay in leveraging the PyKX object API, which allowed a Python-first approach. This API made it easy to embed q/kdb within Python, enabling the direct use of efficient q functions in Python code. Additionally, it provided convenient re-implementations of Pythonic APIs, like the Pandas APIs, eliminating the need for conversions to Pandas in many cases. If feasible, this would enhance the development experience, reduce the chances of errors, and, the team hoped, significantly improve performance.
 
-<< Pandas API example >> 
+She first tried with the PyKX Pandas API re-implementation, which could be actrivated through the following environment variable:
 
 ```python
-traffic = traffic.loc[traffic["error"] == "N"].rename(columns={"carga":"load", 
-"id":"traffic_station",
- "fecha":"date"})
-traffic.drop(["tipo_elem", 
-"error", 
-"periodo_integracion", 
-"intensidad", 
-"ocupacion", 
-"vmed"], axis=1).mode(dropna=True)
+>>> import os
+>>> os.environ['PYKX_ENABLE_PANDAS_API'] = 'true' 
 ```
 
-
-
-Emma thus issued her first `qsql` query in a full-blown Pythonic style using the API:
+Then, she tried the exact same Pandas expression as in the previous section:
 
 ```python
->>> kx.q.qsql.select(tdevice, columns = ['district', 'id', 'longitude', 'latitude'])
+>>> tdevices[['district', 'id', 'latitude', 'longitude']]
 pykx.Table(pykx.q('
-distrito id    longitud  latitud 
----------------------------------
-4        3840  -3.688323 40.4305 
-4        3841  -3.687256 40.43052
-1        3842  -3.691727 40.42213
-4        3843  -3.691929 40.42143
-4        3844  -3.68847  40.43378
-..
+district id   latitude  longitude
+--------------------------------
+4        3840 40.4305  -3.688323
+4        3841 40.43052 -3.687256
+1        3842 40.42213 -3.691727
+4        3843 40.42143 -3.691929
+4        3844 40.43378 -3.68847 
+...
 '))
 ```
 
-By pushing the query straight down into the q realm, there was now no need to convert the entire data into Pandas. "Do as little work as necessary?" Nailed it!
-
-She also found this mantra quite useful, not only for reading from existing tables but also when creating new ones. In fact, she soon encountered the need to import a CSV file containing static data. Rather than importing it into a Pandas dataframe and then
-converting it into a q table, she simply used the `pykx.read` attribute which brings the functionality of the corresponding q keyword into Python, thus avoiding any kind of conversion altogether:
+Et voilà! There were the columns, and she didn't need to convert q tables to Pandas dataframes! "Do as little work as necessary?" Nailed it! And this approach worked for many other methods of the Pandas API as well, such as filtering, dropping, and renaming columns.
 
 ```python
-distrito = kx.q.read.csv("Districts.csv", types = "JFFJJSSS", delimiter=";", as_table=True)
+>>> tdevices = tdevices[tdevices["elem_type"] == "URB"]
+>>> tdevices = tdevices.drop(["elem_type","district", "cod_cent", "name", "utm_x", "utm_y"], axis=1)
+>>> tdevices = tdevices.rename(columns={"longitude":"long", "latitude":"lat","id":"traffic_station"})
 ```
 
-However, Emma faced challenges. She noticed the absence of equivalent attributes for operators like `cast`, `drop`, and `exec`, among others, appreciating that the Pythonic style was mainly geared towards q keyword functions. As `cast`, `drop`, and `exec` were operators rather than standard q functions, she needed to explore alternative
-methods to maintain their Python familiarity. Yet it proved remarkably straightforward!
+While this approach allowed Emma to stay in her beloved Python and avoid costly conversions, the PyKX object API offered other alternatives to query q tables that were worth exploring. Firstly, she had heard that kdb supported querying through plain-old ANSI SQL, and this possibility was enabled through PyKX as well! This time, she decided to use the _weather_ dataset to test this feature:
 
 ```python
->>> kx.q('select district,id,longitude,latitude from tdevice')
+>>> weather = kx.q.read.csv('./abr_meteo23.csv', types='IIII****' + 'FS'*24, delimiter=';', as_table=True)
+>>> kx.q['weather'] = weather
+```
+
+Once loaded, she issued a simple SQL query:
+
+```python
+>>> kx.q.sql('select STATION, count(distinct(MAGNITUDE)) from weather group by STATION')
 pykx.Table(pykx.q('
-distrito id    longitud  latitud 
----------------------------------
-4        3840  -3.688323 40.4305 
-4        3841  -3.687256 40.43052
-1        3842  -3.691727 40.42213
-4        3843  -3.691929 40.42143
-4        3844  -3.68847  40.43378
-..
-'))
+STATION  MAGNITUDE
+------------------
+4        1
+8        2
+16       2
+...
 ```
 
-As an experienced programmer, she was well aware that using strings to represent expressions might not be the most optimal approach. It could lead to errors, vulnerabilities, and a lack of support from the IDE. So, she would recommend to her teams the Pythonic style whenever possible.
+That was nice, but she had also heard about qSQL, a collection of query templates resembling SQL, with enhanced expressiveness when dealing with ordered data. qSQL was also available through PyKX by means of a Pythonic interface:
+
+```python
+>>> kx.q.qsql.select(weather, columns = {'MAGNITUDE': 'count distinct MAGNITUDE'}, by=["STATION"])
+pykx.KeyedTable(pykx.q('
+STATION | MAGNITUDE
+--------| --------
+4       | 1
+8       | 2
+16      | 2
+...
+```
+
+The pythonic interface proved quite convenient, and it was actually extended to many functions from the [q reference card](https://code.kx.com/pykx/1.6/api/q/q.html). However, she noticed the absence of equivalent attributes for operators like `cast`, `drop`, and `exec`, among others. So, she needed to explore alternative methods to be able to express arbitrary q expressions. Yet it proved remarkably straightforward! For instance, the previous qSQL query may also be implemented as follows:
+
+```python
+>>> kx.q("select count distinct MAGNITUDE by STATION from weather")
+pykx.KeyedTable(pykx.q('
+ESTACION| MAGNITUD
+--------| --------
+4       | 1
+8       | 2
+16      | 2
+...
+```
+
+As an experienced programmer, she was well aware that using strings to represent expressions might not be the most optimal approach. It could lead to errors, vulnerabilities, and a lack of support from the IDE. So, she would recommend to her teams the Pythonic style of the Pandas, SQL and qSQL APIs whenever possible.
 
 ## Chapter 3: Putting the World Upside Down
 

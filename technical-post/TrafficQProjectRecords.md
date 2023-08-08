@@ -263,20 +263,13 @@ Before starting the project, the Mad Flow team received training from [Habla Com
 
 * **[Useful Read/Write Functions](https://code.kx.com/pykx/1.6/api/read.html)**
 
->*"PyKX offers several functions that help loading and writing data that are very versatile. Also, the parameters are very intuitive."*
+>*"PyKX offers several functions that help loading and writing data that are very versatile. Also, the parameters are very intuitive."* - Félix Functor 
 
 
 ```python
 traffic_station = kx.q.read.csv('../pmed_ubicacion_12-2022.csv', types = "SII**FFFF", delimiter = ";", as_table=True)
-```
-
-
-```python
 traffic_station[:3].pd()
 ```
-
-
-
 
 <div>
 <table border="1" class="dataframe">
@@ -339,7 +332,7 @@ traffic_station[:3].pd()
 
 * **[Use pythonic indexing](https://code.kx.com/pykx/1.6/user-guide/fundamentals/indexing.html)**
 
-> *"Accessing data from q objects such as lists or tables from Python can be done with indexing similar to what you can use in numpy or pandas. This has made my job much easier."*
+> *"Accessing data from q objects such as lists or tables from Python can be done with indexing similar to what you can use in numpy or pandas. This has made my job much easier."* - Jesús Lambda 
 
 
 ```python
@@ -353,7 +346,7 @@ print(lat[:5])
 
 * **[Use q functions]()**
 
-> *"For those like me who want to delve into the q language and gain experience, you can use language functions, ...*
+> *"For those like me who want to delve into the q language and gain experience, you can use language functions, ...* 
 
 
 ```python
@@ -374,7 +367,7 @@ print(kx.q("lower").each(distinct)) # lower case unique values of the list
     `urb`other`m30
 
 
->*... or even create and use them with PyKX objects."*
+>*... or even create and use them with PyKX objects."* - Eloy Projection
 
 
 ```python
@@ -403,7 +396,7 @@ print(numpy_mean(lat))
     40.42871
 
 
->*... and from Pandas via the Pandas API."*
+>*... and from Pandas via the Pandas API."* - Pepe Doric
 
 
 ```python
@@ -524,7 +517,7 @@ print(kx.q.qsql.select(traffic_station, {"name":"5 # nombre"}, where="tipo_elem 
     "03FT08PM01"
 
 
-> *...or using our own functions q."*
+> *...or using our own functions q."*  - ....
 
 
 ```python
@@ -542,7 +535,7 @@ print(kx.q("{select name:5#nombre from x where tipo_elem = `other}", traffic_sta
 
 * **Use [SQL querys](https://code.kx.com/pykx/1.6/api/query.html)**
 
->*"Whoa! PyKX lets you use SQL queries too!"*
+>*"Whoa! PyKX lets you use SQL queries too!"*- ....
 
 
 ```python
@@ -566,7 +559,7 @@ kx.q.sql("select nombre as name from $1 where tipo_elem='other' limit 5", traffi
 
 * **Q Context**
 
-> *"I'm more comfortable programming in q, so I work in the q context. PyKX objects can be passed into the q context and work with them as if you were in a q ecosystem."*
+> *"I'm more comfortable programming in q, so I work in the q context. PyKX objects can be passed into the q context and work with them as if you were in a q ecosystem."* - ....
 
 
 ```python
@@ -711,15 +704,12 @@ lat.py()[:5]
 
 
 
->*... and then back to q so that colleagues can continue the work."*
+>*... and then back to q so that colleagues can continue the work."* - ....
 
 
 ```python
 kx.toq(lat.py())
 ```
-
-
-
 
     pykx.FloatVector(pykx.q('40.4305 40.43052 40.42213 40.42143 40.43378 40.42351 40.42816 40.42879 40.426..'))
 

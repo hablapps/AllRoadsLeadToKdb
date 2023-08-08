@@ -26,7 +26,7 @@ In this technical report, we will outline the process of migrating our code to t
   [**PyKX saving the day!**](#t21)   
   [**Datasets**](#t23)   
   [**Model**](#t24)   
-[**Q Migration**](#t3)
+[**Qholic**](#t3)
 
 ## Use Case <a class="anchor" id="t11"></a>
 
@@ -35,6 +35,8 @@ The objective of the project is to prepare and join the traffic and weather data
 Although this project is novel in the city of Madrid, there are many articles that support it. For example, [F. Malik et al.](https://www.mdpi.com/1424-8220/20/13/3749) forecasted traffic in Madrid based on air pollution through a model based on LSTM.
 
 There are many studies regarding the dependence of the weather on traffic, especially focused on rainfall. None of the studies are carried out in Madrid, but rather in several large cities such as Manchester ([A. Essien et al.](https://pure.manchester.ac.uk/ws/portalfiles/portal/72721911/DEXA_Camera_8_pages.pdf)), Shenzhen ([Y. Yao et al.](https://ieeexplore.ieee.org/document/8964560)) or Belgrade ([M. Vidas et al.](https://www.safetylit.org/citations/index.php?fuseaction=citations.viewdetails&citationIds[]=citjournalarticle_716898_14)). The results of these studies predict a 5-15% increase in traffic volume on weekdays during peak hours.
+
+Regarding the use of PyKX on Pandas we can find several blogs in [KX developer] (https://kx.com/resources/developer-blog/) such as [A. Morrison](https://kx.com/blog/accelerating-python-workflows-using-pykx/) where he uses PyKX in the field of financial services. This article shows a big speed advantage of PyKX over Pandas.
 
 ## Input Data <a class="anchor" id="t12"></a>
 
@@ -1547,11 +1549,10 @@ As for the rest of the code we explained throughout the PyKX migration part, it 
 
 # Final thoughts
 
-...
+In the end, the project was a success: it was possible to convert a code with a chaotic organization and performance problems, into a concise and understandable one accelerated thanks to kdb/q. PyKX has allowed a heterogeneous team in terms of kdb/q experience to work together on the project. This is thanks to the different levels of integration that PyKX has and their compatibility with each other. It has also introduced less experienced team members to kdb/q in a language friendly way. Even finally, the code was migrated again this time to pykx from the q side.
 
+The pykx.q library allows, as we have discussed earlier, to use existing Python codebases. This feature is really useful, specially when dealing with code migrations from Python. In our experience, we found specially tough to match the Python input shape to the one converted from q. After converting to Python with `.pykx.set` we often had to mess around with this transformed objects inside the Python environment or change the default conversion type to match it with the expected input the Python function needed. Once that was dealt with, the experience using this library was really nice and technically impressive.
 
-The pykx.q library allows, as we have discussed earlier, to use existing Python codebases. This feature is really useful, specially when dealing with code migrations from Python. In our experience, we found specially tough to match the Python input shape to the one converted from q. After converting to Python with let's say `.pykx.set` we often had to mess around with this transformed objects inside the Python environment or change the default conversion type to match it with the expected input the Python function needed. Once that was dealt with, the experience using this library was really nice and technically impressive.
-
-Since the data we needed to transfer back and forth between memory spaces was not that big (we were cautious this was the case) we didn't notice a performance loss at all.
+Since the data we needed to transfer back and forth between memory spaces was not that big (we were cautious this was the case) we didn't notice a performance loss at all but a great improvement compared to Pandas.
 
 Overall we would rate both PyKX libraries highly since it enables users to reuse existing code, reducing the time needed to perform a migration from and to these two languages.

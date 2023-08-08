@@ -12,11 +12,11 @@ In this technical report, we will outline the process of migrating our code to t
 
 <div class="alert alert-block alert-info">
     <b> 🔍 You can find <a href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">Original Python Project</a> in Github. 
-</div>
+</div>   
+ 
+This is the **outline** of the report: 
 
-**Index**
-
-[**The project**](#t1)   
+[**The Project**](#t1)   
   [**The Use Case**](#t11)   
   [**The Data**](#t12)   
   [**The Cleaning**](#t13)   

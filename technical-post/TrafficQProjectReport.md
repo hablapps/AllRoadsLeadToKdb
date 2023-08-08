@@ -705,7 +705,7 @@ lat.py()[:5]
 
 
 
->*... and then back to q so that colleagues can continue the work."* - ....
+>*... and then back to q so that colleagues can continue the work in q."* - ....
 
 
 ```python

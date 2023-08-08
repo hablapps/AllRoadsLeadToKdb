@@ -8,7 +8,7 @@ Throughout our testing phase, we encountered a significant performance limitatio
 
 Fortunately, we found a viable solution to our problem: Kdb+/q by KX. This platform proved to be exceptionally fast and flexible, enabling real-time data processing. Additionally, KX provided PyKX, an open-source library designed to be user-friendly for Python programmers—crucial for seamless integration with our existing Mad Flow infrastructure.
 
-In this technical report, we will outline the process of migrating our code to the KX platforms. Before delving into the implementation details, we will first present the use case and the current status of our project. By sharing our experiences with Kdb+/q and PyKX, we hope to shed light on the positive impact these tools have had on our endeavor at Mad Flow.
+In this technical report, we will outline the process of migrating our code to the KX platform. Before delving into the implementation details, we will first present the use case and the current status of our project. By sharing our experiences with Kdb+/q and PyKX, we hope to shed light on the positive impact these tools have had on our endeavor at Mad Flow.
 
 <div class="alert alert-block alert-info">
     <b> 🔍 You can find <a href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">Original Python Project</a> in Github. 
@@ -22,13 +22,13 @@ In this technical report, we will outline the process of migrating our code to t
   [**The Cleaning**](#t13)   
   [**The Final Table**](#t14)   
   [**The Interpretation**](#t15)   
-[**PyKX migration:**](#t2)   
+[**PyKX migration**](#t2)   
   [**PyKX saving the day!**](#t21)   
   [**Datasets**](#t23)   
   [**Model**](#t24)   
-[**Q Migration:**](#t3)
+[**Q Migration**](#t3)
 
-## The Use Case <a class="anchor" id="t11"></a>
+## Use Case <a class="anchor" id="t11"></a>
 
 The objective of the project is to prepare and join the traffic and weather data to be ingested by an LSTM model.
 
@@ -36,13 +36,13 @@ Although this project is novel in the city of Madrid, there are many articles th
 
 There are many studies regarding the dependence of the weather on traffic, especially focused on rainfall. None of the studies are carried out in Madrid, but rather in several large cities such as Manchester ([A. Essien et al.](https://pure.manchester.ac.uk/ws/portalfiles/portal/72721911/DEXA_Camera_8_pages.pdf)), Shenzhen ([Y. Yao et al.](https://ieeexplore.ieee.org/document/8964560)) or Belgrade ([M. Vidas et al.](https://www.safetylit.org/citations/index.php?fuseaction=citations.viewdetails&citationIds[]=citjournalarticle_716898_14)). The results of these studies predict a 5-15% increase in traffic volume on weekdays during peak hours.
 
-## The Data <a class="anchor" id="t12"></a>
+## Input Data <a class="anchor" id="t12"></a>
 
 Madrid weather and traffic data are offered by the [Madrid City Council](https://datos.madrid.es/portal/site/egob). These datasets include live and historical records. For model ingestion we only need the historical data, which is provided in CSV format. It's divided into months from the year 2018 to the present.
 
-**Weather**
+### Weather
 
-[Weather data](https://datos.madrid.es/portal/site/egob/menuitem.3efdb29b813ad8241e830cc2a8a409a0/?vgnextoid=4950cc720ba29610VgnVCM2000001f4a900aRCRD&vgnextchannel=102612b9ace9f310VgnVCM100000171f5a0aRCRD&vgnextfmt=default) is captured by stations located throughout the city of Madrid. It looks like the following table:
+[Weather data](https://datos.madrid.es/portal/site/egob/menuitem.3efdb29b813ad8241e830cc2a8a409a0/?vgnextoid=4950cc720ba29610VgnVCM2000001f4a900aRCRD&vgnextchannel=102612b9ace9f310VgnVCM100000171f5a0aRCRD&vgnextfmt=default) is captured by stations located throughout the city of Madrid. It has the following format:
 
 |    |   weather_station |   magnitud |   year |   month |   day |    H01 | V01   | ...|
 |---:|------------------:|-----------:|-------:|--------:|------:|-------:|------:|:------|
@@ -53,7 +53,7 @@ Madrid weather and traffic data are offered by the [Madrid City Council](https:/
 |  4 |               108 |         87 |   2022 |      12 |    22 |    2   | N     |...|
 
 
-In the documentation they tell us that the magnitude column indicates what type of meteorological measure unit has been taken in the row:
+In the documentation we are told that the magnitude column indicates which meteorological measure unit has been taken in the row:
 
     · 80: ultraviolet
     · 81: wind
@@ -74,9 +74,9 @@ Then we have two columns for each hour. The first tells us the value for the dat
 |  3 |                18 |    -3.73184 |    40.3948 |
 |  4 |                24 |    -3.74734 |    40.4194 |
 
-**Traffic**
+### Traffic
 
-Traffic sensors are located at traffic lights in the city of Madrid. The data obtained is made up of several measurements of the road situation such as speed or traffic volume. All of these metrics are coded into the "load" metric (a percentage that measures congestion). The [traffic table](https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=02f2c23866b93410VgnVCM1000000b205a0aRCRD&vgnextchannel=374512b9ace9f310VgnVCM100000171f5a0aRCRD) head is:
+Traffic sensors can be found at traffic lights in the city of Madrid. The data obtained is made up of several measurements of the road situation such as speed or traffic volume. All of these metrics are coded into the "load" metric (a percentage that measures congestion). The [traffic table](https://datos.madrid.es/portal/site/egob/menuitem.c05c1f754a33a9fbe4b2e4b284f1a5a0/?vgnextoid=02f2c23866b93410VgnVCM1000000b205a0aRCRD&vgnextchannel=374512b9ace9f310VgnVCM100000171f5a0aRCRD) head is:
 
 |    |   traffic_station | tipo_elem   |   intensidad |   ocupacion |   load |   vmed | error   |   periodo_integracion | date                |
 |---:|------------------:|:------------|-------------:|------------:|-------:|-------:|:--------|----------------------:|:--------------------|
@@ -93,11 +93,11 @@ The table also contains a column for the date and another one that identifies th
 |  1 | "URB"         |            4 |   3841 | "01002"      | "Jose Ortega y Gasset O-E - Serrano-Pº Castellana"                |    441706 | 4.47577e+06 |    -3.68726 |    40.4305 |
 |  2 | "URB"         |            1 |   3842 | "01003"      | "Pº Recoletos N-S - Almirante-Prim"                               |    441319 | 4.47484e+06 |    -3.69173 |    40.4221 |
 
-## The Cleaning  <a class="anchor" id="t13"></a>
+## Data Cleaning  <a class="anchor" id="t13"></a>
 
 Once the data has been loaded, we needed to prepare the data to be used in the analysis and the model. As we are dealing with heterogeneous datasets, the cleaning of the data will be done independently and the data will be assembled a single table later on.
 
-#### Weather
+### Weather
 
 1. In the weather dataset we first have the date separated into day, month and year, but in traffic all these data are together. This is why the columns have been grouped into a date column of shape: ```day-month-year```. 
 
@@ -120,9 +120,9 @@ Once the data has been loaded, we needed to prepare the data to be used in the a
 |    1 | 2022-12-01 00:00:00 |                 8 |           0 |         67 |          0 |        0   |       0 |           9.4 |   0    |
 |    2 | 2022-12-01 00:00:00 |                16 |           0 |         73 |          0 |        0   |       0 |           8.9 |   0    |
 
-#### Traffic
+### Traffic
 
-1. First we filter out the values with measurement errors. In the documentation they tell us that these values are represented with an "N". 
+1. First we filter out the values with measurement errors. In the documentation it is said that these values are represented with an "N". 
 
 2. We only keep the load measurement, which is what we are interested in for the analysis.
 
@@ -130,9 +130,9 @@ Once the data has been loaded, we needed to prepare the data to be used in the a
 
 The average time for loading and processing a month of traffic information is **43.9 s**. The team is concerned about the slowness and the possible effect it will have on real-time data processing.
 
-**Location**
+### Location
 
-To join the two previous tables we need to know which traffic sensors correspond to the weather stations. To do this you can use a distance matrix and find the closest pairs between these. You could measure this distance directly with the coordinates, but to make the distances more understandable we used the Haversine distance, which calculates the distance in meters between a pair of coordinates. It can be seen in the next heatmap that these distances are between 0 and 20 km:
+To join the two previous tables we need to know which traffic sensors correspond to the weather stations. To do this we decided to use a distance matrix and find the closest pairs between them. You could measure this distance directly using the coordinates, but to make the distances more understandable we used the Haversine distance, which calculates the distance in meters between a pair of coordinates. It can be seen in the next heatmap that these distances are between 0 and 20 km:
 <table>
     <tr>
         <td style='text-align:center'>
@@ -146,7 +146,7 @@ To join the two previous tables we need to know which traffic sensors correspond
 
 ## The Final Table <a class="anchor" id="t14"></a>
 
-Once we have prepared the 3 tables -weather, traffic and distance- we put them together. Since the weather table has time intervals of 1 hour while the traffic ones have 15 minutes, we will join both tables with an asof join. And, finally, we can add the information of the time and the day of the week to study its dependence on the traffic load.
+Once we have prepared the 3 tables -weather, traffic and distance- we need to join them together somehow. Since the weather table has time intervals of 1 hour while the traffic ones have 15 minutes, we will join both tables with an asof join. And, finally, we can add the information of the time and the day of the week to study its dependence on the traffic load.
 
 |    | date                |   traffic_station |   load |   Distance |   Closest |   weather_station |   direction |   humidity |   pressure |   rainfall |   solar |   temperature |   wind |   weekday |   hour |
 |---:|:--------------------|------------------:|-------:|-----------:|----------:|------------------:|------------:|-----------:|-----------:|-----------:|--------:|--------------:|-------:|----------:|-------:|
@@ -158,7 +158,7 @@ Once we have prepared the 3 tables -weather, traffic and distance- we put them t
 
 ## Data interpretation <a class="anchor" id="t15"></a>
 
-Several studies were carried out to find out which time variables could be interesting to add to the model. First off, since traffic is so dependent on time, the measurements will be filtered to obtain the days of the week and the hours where there is usually more traffic. This will make it easier for the test model to learn. School days tend to have more traffic than holidays. Just as there is usually more traffic during the day than at night. In the following figure we can verify that the data have a strong seasonality:
+Several studies were carried out to find out which time variables could be interesting to add to the model. First off, since traffic is so dependent on time, the measurements will be filtered to obtain the days of the week and the hours where there is usually more traffic. This will make it easier for the test model to learn. School days tend to have more traffic than holidays. Just as there is usually more traffic during the day than at night. In the following figures we can verify that the data have a strong seasonality:
 
 <table>
     <tr>
@@ -177,7 +177,7 @@ Several studies were carried out to find out which time variables could be inter
     </tr>
 </table>
 
-We keep the data between 10 a.m. and 8 p.m., from Monday to Friday, for the rest of the project.
+As such, we will filter our data so that we only use information between 10 a.m. and 8 p.m. and from Monday to Friday for the rest of the project.
 
 Regarding the Rainfall-Load dependency we started seeing that rainy days are very few on our dataset:
 
@@ -192,7 +192,7 @@ Regarding the Rainfall-Load dependency we started seeing that rainy days are ver
 | 99.9% |      2.9       |
 | max   |     10.9       |
 
-We can see in the percentiles of the precipitation column that there are very few recordings with rain. This is why the measurements were divided into different classes depending on the level of rain and we did a separate analysis for the data with heavy rain, moderate to moderate and no rain. The analysis was done hourly to avoid the temporal dependence of the load. We can verify this in the following table, where the average increase in hours of traffic congestion with rain can go from 5% to 14%, which agrees with the studies presented in [The Use Case](#t12).
+We can see in the percentiles of the precipitation column that there are very few recordings with rain. This is why the measurements were divided into different classes depending on the level of rain and we did a separate analysis for the data with heavy rain, moderate to moderate and no rain. The analysis was done hourly to avoid the temporal dependence of the load. We can verify this in the following table, where the average increase in hours of traffic congestion with rain can go from 5% to 14%, which agrees with the studies presented in [the Use Case](#t12).
 <table>
     <tr>
         <td style='text-align:center'>
@@ -204,18 +204,20 @@ We can see in the percentiles of the precipitation column that there are very fe
     </tr>
 </table>
 
-To verify that these differences between groups are significant, we can perform an anova test. And we see that in all hours there is great evidence that the load is different between the different levels of rain. For example, for hour 12:
+To verify that these differences between groups are significant, we can perform an anova test. And we see that for all hours there is great evidence that the load is affected by the different levels of rain. For example, for hour 12:
 
 |             |          sum_sq |    df |        F |       PR(>F) |
 |:------------|----------------:|------:|---------:|-------------:|
 | C(rainfall) | 37650.7         |     6 |  20.1144 |   1.3346e-23 |
 | Residual    |     8.01363e+06 | 25687 | nan      | nan          |
 
-It was decided to include precipitation within the model. The rest of the meteorological conditions did not give such a clear result, so they were left out.
+We decided to incorporate precipitation into the model. The rest of the meteorological conditions did not give such a clear result, so they were left out.
 
 ## Month 6:  The Model <a class="anchor" id="t16"></a>
 
-To check the performance we created a toy model using a simple LSTM with 5 steps back to forecast the load at a single station. The input includes only the 5 steps prior to the prediction of the load, we also incluede the rainfall, the hour and day of the week columns. The results for a single station seem quite positive as can be seen in [Graph 6](#Image61). But the temporary cost for a single station and a single month is unaffordable for the project budget. Also, the pre-processing takes too long for the final application in real time.
+To check the performance we created a toy model using a simple LSTM with 5 steps back to forecast the load at a single station.
+
+The input includes only the 5 steps prior to the prediction of the load, it also includes the rainfall measure, the hour and day of the week columns. The results for a single station seem quite positive as can be seen in [Graph 6](#Image61). But the temporary cost for a single station and a single month is unaffordable for the project budget. Also, the pre-processing takes too long for the final application in real time.
 
 <table><a class="anchor" id="Image61"></a>
     <tr>
@@ -237,7 +239,7 @@ To check the performance we created a toy model using a simple LSTM with 5 steps
 
 # PyKX migration <a class="anchor" id="t2"></a>
 
-Now that we have cleared out the project's goal, we will explain the steps that have been taken for the code migration, which include a training stage in q and pykx for the team, the datasets loading and cleaning and the model ingestion. But first of all we need to install and import PyKx:
+Now that we have cleared out the project's goal, we will explain the steps that have been taken for the code migration, which include a training stage in q and PyKX for our team, the datasets loading and cleaning and the model ingestion. But first of all we need to install and import PyKx:
 
 
 ```python
@@ -255,11 +257,11 @@ import pykx as kx
 
 ## Learning PyKX <a class="anchor" id="t21"></a>
 
-Before starting the project, the Mad Flow team received training from [Habla Computing](https://hablapps.com/) on q and PyKX. After this introduction to KX platforms, some of the developers fell in love with q, while others felt more comfortable in the Python ecosystem. PyKX is designed so that these two profiles coexist in the same development environment. The team has compiled perspectives on programming with PyKX along with various techniques they discovered during training.:
+Before starting the project, the Mad Flow team received training from [Habla Computing](https://hablapps.com/) on q and PyKX. After this introduction to the KX platform, some of the developers fell in love with q, while others felt more comfortable in the Python ecosystem. PyKX is designed so that these two profiles are able to coexist in the same development environment. The team has compiled perspectives on programming with PyKX along with various techniques they discovered during training:
 
 * **[Useful Read/Write Functions](https://code.kx.com/pykx/1.6/api/read.html)**
 
->*"PyKX offers several functions that help loading and writing data, they are very versatile and the parameters are very intuitive."*
+>*"PyKX offers several functions that help loading and writing data that are very versatile. Also, the parameters are very intuitive."*
 
 
 ```python
@@ -275,19 +277,6 @@ traffic_station[:3].pd()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -348,7 +337,7 @@ traffic_station[:3].pd()
 
 * **[Use pythonic indexing](https://code.kx.com/pykx/1.6/user-guide/fundamentals/indexing.html)**
 
-> *"Accessing data from q objects such as lists or tables from python can be done with indexing similar to what you can use in numpy or pandas. This has made my job much easier."*
+> *"Accessing data from q objects such as lists or tables from Python can be done with indexing similar to what you can use in numpy or pandas. This has made my job much easier."*
 
 
 ```python
@@ -383,7 +372,7 @@ print(kx.q("lower").each(distinct)) # lower case unique values of the list
     `urb`other`m30
 
 
->*... or even create and use them with pykx objects."*
+>*... or even create and use them with PyKX objects."*
 
 
 ```python
@@ -412,7 +401,7 @@ print(numpy_mean(lat))
     40.42871
 
 
->*... and from pandas via the Pandas API."*
+>*... and from Pandas via the Pandas API."*
 
 
 ```python
@@ -429,19 +418,6 @@ traffic_station[traffic_station["tipo_elem"]=="other"][:5].pd() # filter rows wh
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -525,12 +501,12 @@ traffic_station[traffic_station["tipo_elem"]=="other"][:5].pd() # filter rows wh
 
 
 <div class="alert alert-block alert-info">
-<b>To use it we only have to import numpy and pandas and activate a flag. Pandas API is still in the development phase, so it does not have all the functions of Pandas yet. More information in <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html"> Pandas API </a> . 
+<b>To use it we only have to import Numpy and Pandas and activate a flag. The Pandas API is still in the development phase, so it does not have all the functions of Pandas implemented yet. More information in <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html"> Pandas API </a> . 
 </div>
 
 * **Use [qSQL querys](https://code.kx.com/pykx/1.6/api/query.html)**
 
-> *"SQL queries are very powerful and concise at the same time. PyKX allows you to query PyKX objects as well as API functions...* 
+> *"qSQL queries are very powerful and concise at the same time. PyKX allows you to query PyKX objects as well as API functions...* 
 
 
 ```python
@@ -564,7 +540,7 @@ print(kx.q("{select name:5#nombre from x where tipo_elem = `other}", traffic_sta
 
 * **Use [SQL querys](https://code.kx.com/pykx/1.6/api/query.html)**
 
->*"Whoa! PyKx lets you use SQL queries too!"*
+>*"Whoa! PyKX lets you use SQL queries too!"*
 
 
 ```python
@@ -588,7 +564,7 @@ kx.q.sql("select nombre as name from $1 where tipo_elem='other' limit 5", traffi
 
 * **Q Context**
 
-> *"I'm more comfortable programming in q, so I work in the q context. PYKX objects can be passed into the q context and work with them as if you were in a q ecosystem:"*
+> *"I'm more comfortable programming in q, so I work in the q context. PyKX objects can be passed into the q context and work with them as if you were in a q ecosystem."*
 
 
 ```python
@@ -715,7 +691,7 @@ lat.np()[:5]
 
 
 
-> *... and python to work on ...*
+> *... and Python to work on ...*
 
 
 ```python
@@ -753,14 +729,14 @@ During the development of the project some of these methods will be described in
 
 ### Weather
 
-The loading of the data will be done with the utility provided by [PyKX](https://code.kx.com/pykx/1.4/api/read.html):
+The data loading will be done with the utilities provided by [PyKX](https://code.kx.com/pykx/1.4/api/read.html):
 
 
 ```python
 weather = kx.q.read.csv('../dic_meteo22.csv', types='I'*4 + '*'*4 + 'FS'*24, delimiter=';')
 ```
 
-The parameters of this function are quite standard. The url to the file and the delimiter are indicated. We highlight the *types* parameter that expects the q [types](https://code.kx.com/q/basics/datatypes/) of each column. Our table is now a PyKX object:
+The parameters of this function are quite standard. The path to the file and the delimiter are indicated. We highlight the *types* parameter that expects the q [types](https://code.kx.com/q/basics/datatypes/) of each column. Our table is now a PyKX object:
 
 
 ```python
@@ -774,7 +750,7 @@ type(weather)
 
 
 
-But it is not in the q context. Let's see how to access these objects and how to use q features on them. Let's start with the simple *xcol* function, which allows us to rename columns:
+As we can see, it's not inside the q context. Let's see how to access these objects and how to use q features on them. Let's start with the simple *xcol* function, which allows us to rename columns:
 
 
 ```python
@@ -810,7 +786,7 @@ print(weather["year", "month", "day"])
     "22"   "22"   "22"   "22"   "22"   "22"   "22"   "01"   "02"   "03"   "04"   ..
 
 
-We see that the result is three lists of the sample size. Our goal is a list of sample size with the three elements that make up the date joined together:
+We can see that the result is three lists of the sample size. Our goal is a list of sample size with the three elements that make up the date joined together:
 
 
 ```python
@@ -834,7 +810,7 @@ print(kx.q.each(kx.q.raze, kx.q.flip(weather["year", "month", "day"]))[:3])
     "20221222"
 
 
-All that remains is to convert the data type from string to date. Unfortunately, some functions (especially the overloaded glyphs) are not yet implemented. For example cast (`$`), take (`#`), concat (`,`)... So we are forced to abandon pythonic way of calling q functions and perform this casting writing kdb+/q code using the pykx.q method:
+All that remains is to convert the data type from string to date. Unfortunately, some functions (especially the overloaded glyphs) are not yet implemented. For example cast (`$`), take (`#`), concat (`,`)... So we are forced to abandon pythonic way of calling q functions and perform this casting writing kdb+/q code using the `pykx.q` method:
 
 
 ```python
@@ -852,7 +828,7 @@ Finally, we add this column to our table:
 weather_ = kx.q.qsql.update(weather, columns = {'date': date})
 ```
 
-Some team members started using kdb/q code instead of PyKX functions in the pythonic way, they found the code more elegant and concise. Once the team had a little more fluency, a function entirely in q was proposed:
+Some team members started using q code instead of PyKX functions in the pythonic way, as they found the code more elegant and concise. Once the team had a little more fluency, a function written entirely in q was proposed:
 
 
 ```python
@@ -879,19 +855,6 @@ weather[:3].pd()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -999,7 +962,7 @@ weather[:3].pd()
 
 
 
-Now it's time to turn our attention into breaking down the H* and V* queries into multiple rows, and supplying a time column to avoid missing information. The way to proceed in q would be to use functional qsql to select the columns that follow the previous patterns, but we are going to take advantage of the fact that the q code in pykx is introduced through Strings to avoid it:
+Now it's time to turn our attention into breaking down the H* and V* queries into multiple rows, and supplying a time column to avoid missing information. The way to proceed in q would be to use functional qSQL to select the columns that follow the previous patterns, but we are going to take advantage of the fact that the q code in PyKX is introduced through strings to avoid it:
 
 
 ```python
@@ -1009,7 +972,7 @@ def functionalSearch(cols, pattern, func):
   return xcols, xstring
 ```
 
-The above function receives a list of columns, a pattern to search for, and a function q in string format that passes as an argument the columns found following that pattern in qSQL format (where columns are accessed with their names and not with a symbol). Applying this to all columns starting with *"H"* returns these columns as a vector of Symbols and in a String these columns in qSQL format:
+The above function receives a list of columns, a pattern to search for, and a q function in string format that passes as an argument the columns found following that pattern in qSQL format (where columns are accessed with their names and not with a symbol). Applying this to all columns starting with *"H"* returns these columns as a vector of symbols and a string of these columns in qSQL format:
 
 
 ```python
@@ -1024,15 +987,15 @@ print("qSQL function: ", qsql_function)
     qSQL function:  H01;H02;H03;H04;H05;H06;H07;H08;H09;H10;H11;H12;H13;H14;H15;H16;H17;H18;H19;H20;H21;H22;H23;H24
 
 
-This is very powerful, as it allows us to use qSQL with variables without having to use functional forms (usually complicated for first-time kdb/q developers).
+This is very powerful, as it allows us to use qSQL with variables without having to use functional forms (usually complicated for first-time kdb+/q developers).
 
 
 <div class="alert alert-block alert-info">
-<b> Although for reasons of the post we try to stay as long as possible in pykx, the use of python entirely to form these queries in string format avoids encoding transformations.
+<b> Although for reasons of the post we try to stay as long as possible in PyKX, the use of Python entirely to form these queries in string format avoids encoding transformations.
 </div>
 
 
-Let's use the above for the columns beginning **H**, which will give us the measurement value; and the columns that begin with **V**, which tell us if the measurement is valid. The function that we must use so that the measurements in column format become rows is *flip*:
+Let's use the above function for the columns beginning **H**, which will give us the measurement value, and the columns that begin with **V**, which tell us if the measurement is valid. The function that we must use so that the measurements in column format become rows is *flip*:
 
 
 ```python
@@ -1040,7 +1003,7 @@ hcols, value = functionalSearch(cols, b'H*', "flip({})")
 vcols, valid = functionalSearch(cols, b'V*', "flip({})")
 ```
 
-Now we just have to pass our built-in functions in String format to the qSQL "update" function, together with the 24 hours repeated the initial number of rows:
+Now we just have to pass our built-in functions in string format to the qSQL "update" function, together with the 24 hours repeated the initial number of rows:
 
 
 ```python
@@ -1065,19 +1028,6 @@ weather[:3].pd()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1131,7 +1081,7 @@ Now all we have to do is expand the table so that each element of the lists corr
 weather = kx.q.ungroup(weather)
 ```
 
-You can shrink the table a bit more by removing the rows that are not valid and joining the date with the time:
+We can shrink the table a bit more by removing the rows that are not valid and joining the date with the time:
 
 
 ```python
@@ -1145,19 +1095,6 @@ weather[:3].pd()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1210,7 +1147,7 @@ magnitude = {80:"ultraviolet",
              89:"rainfall"}
 ```
 
-We just have to change the key by the value of the dictionary. Note that in the following functions an object from the Python world is being passed to a kdb/q function. If Python objects have a direct translation in q, such as dictionaries, they can be passed as attributes in pykx functions. Underneath, pykx takes care of accommodating it to q.
+We just have to change the key by the value of the dictionary. Note that in the following functions an object from the Python world is being passed to a q function. If Python objects have a direct translation in q, such as dictionaries, they can be passed as attributes to PyKX functions. Underneath, PyKX takes care of transforming it to q.
 
 
 ```python
@@ -1224,7 +1161,7 @@ Finally, all you have to do is separate the different weather conditions into di
 weather = kx.q('{exec (value x)#magnitude!values by date,weather_station from y}',magnitude,weather)
 ```
 
-The query exec allows us to convert a dictionary stored in a column into multiple columns with the key as the column name and the values as the data in that column. This is useful when we create a dictionary made up of the weather conditions of each row associated with their values. By applying it and grouping we have the weather conditions in different columns for each weather entry and weather station.
+The exec query allows us to convert a dictionary stored in a column into multiple columns with the key as the column name and the values as the data in that column. This is useful when we create a dictionary made up of the weather conditions of each row associated with their values. By applying it and grouping we have the weather conditions in different columns for each weather entry and weather station.
 
 ### Traffic
 
@@ -1255,7 +1192,7 @@ kx.q["weather_station"] = kx.q.read.csv('../Estaciones_control_datos_meteorologi
 kx.q["traffic_station"] = kx.q.read.csv('../pmed_ubicacion_12-2022.csv', types = "SII**FFFF", delimiter = ";", as_table=True)
 ```
 
-We can now access these objects in kdb/q functions without needing to pass them as pykx or python objects. For example, let's change the name of the columns in both tables so that they have more standard ones:
+We can now access these objects inside the q context without needing to pass them as PyKX or Python objects. For example, let's rename the columns in both tables to standardize them:
 
 
 ```python
@@ -1269,9 +1206,9 @@ To bring them to the Python environment, you just have to return them using q co
 kx.q("table")
 ```
 
-Our goal is to join these two tables. There seems to be no identifier that allows us to do a standard join. However, both are located by coordinates. We can use the distance between the stations for measuring traffic and weather to join them. To calculate the distance between two coordinates, the Harvesine distance can be used. This distance is already developed in Python but it is not available on q.
+Our goal is to join these two tables. There seems to be no identifier that allows us to do a standard join. However, both the weather and traffic stations are located by coordinates. We can use the distance between the stations for measuring traffic and weather to join them. To calculate the distance between two coordinates, the Harvesine distance can be used as discussed earlier. This distance function is already developed in Python but it is not available on q.
 
-One option would be to reimplement it in q, but this is not feasible for some complex libraries. Although slower, there is the alternative of passing our q objects to Python and working with them. However, it is advisable to keep using q objects for as long as possible. These features we just explained for moving from Python objects to q and vice versa allow us, at least temporarily, to reuse Python code. It is also reasonable for the size of tables we are working with in this step. To introduce our q objects in this function, we can use some of the PyKX features to transform them into Python objects that we talked about in [Learning Pykx]().
+One option would be to reimplement it in q, but this is not feasible in case we were dealing with more complex libraries. Although slower, there is the alternative of passing our q objects to Python and working with them. However, it is advisable to keep using q objects for as long as possible. These features we just explained for moving from Python objects to q and vice versa allow us, at least temporarily, to reuse Python code. It is also reasonable for the size of tables we are working with in this step. To introduce our q objects in this function, we can use some of the PyKX features to transform them into Python objects that we talked about in [Learning Pykx]().
 
 
 ```python
@@ -1293,7 +1230,7 @@ distance_table = kx.q.qsql.delete(distance_table, columns = ['tipo_elem','distri
 
 ### Final Table
 
-The join of the three tables is fairly straightforward. The one of distances can be joined with any of the two by means of a simple left join. The traffic and weather ones have to be joined with asof join as they have different time intervals. Finally, two columns are added to convey the seasonality of the data to the model: time and day of the week.
+The joining of the three tables is fairly straightforward. The one of distances can be joined with any of the two by means of a simple left join. The traffic and weather ones have to be joined with asof join as they have different time intervals. Finally, two columns are added to convey the seasonality of the data to the model: time and day of the week.
 
 
 ```python
@@ -1313,19 +1250,6 @@ kx.q("5#",complete).pd()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1460,7 +1384,7 @@ final = kx.q.qsql.select(complete, columns = {"date": "date",
                                     )
 ```
 
-During PyKX migration from Pandas, the main hassle was to migrate the time_window function, as it relied on loops. The way we approached it was to first understand the input we had, the output we needed and then think of an idiomatic way to implement it using q instead of doing a 1:1 migration, which would have probably be more costly in terms of time. In this case, our input was a table and our output was a list of matrices for each station. We created several functions that helped us during the process:
+During this migration from Pandas, the main hassle was to migrate the time_window function, as it relied on loops. The way we approached it was to first understand the input we had, the output we needed and then think of an idiomatic way to implement it using q instead of doing a 1:1 migration, which would have probably be more costly in terms of time. In this case, our input was a table and our output was a list of matrices for each station. We created several functions that helped us during the process:
 
 * **sliding window**: given a matrix, x, divides it into chunks of length y:
 
@@ -1569,7 +1493,7 @@ plt.show()
 
 # Qholic <a class="anchor" id="t3"></a>
 
-When the team got comfortable with the kdb/q language they started using almost entirely q code through `kx.q`, as it was more concise. But the programming became somewhat tedious having to use Strings. This is why it was decided to jump to a q environment. But as seen in the previous chapter, there was Python code that the team couldn't port to q. For this reason it was decided to stay in pykx but this time in the q environment.
+When the team got comfortable with q they started using it almost entirely through `kx.q`, as it was more concise. But the programming became somewhat tedious having to use strings. This is why it was decided to jump to a q environment. But as seen in the previous chapter, there was Python code that the team couldn't port to q. For this reason it was decided to stay in PyKX but this time inside the q environment.
 
 pykx.q allows Python code execution on a q environment and, as a result, it opens up the door for new opportunities when dealing with existing codebases as it allows for importing and using Python libraries, both installed on the system and available as .py files.
 
@@ -1618,3 +1542,9 @@ modelfit[train[0][3403];train[1][3403];test[0][3403];test[1][3403]];
 modelpredict:.pykx.get`predict;
 res:modelpredict[train[0][3403]];
 ```
+
+As for the rest of the code we explained throughout the PyKX migration part, it proved to be quite straightforward, especially when dealing with the code written using `pykx.q()` as strings.
+
+# Final thoughts
+
+...

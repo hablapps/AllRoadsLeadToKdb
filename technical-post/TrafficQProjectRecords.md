@@ -1539,10 +1539,10 @@ As for the rest of the code we explained throughout the PyKX migration part, it 
 
 # Final thoughts
 
-In the end, the project was a success: it was possible to convert a code with a chaotic organization and performance problems, into a concise and understandable one accelerated thanks to kdb/q. PyKX has allowed a heterogeneous team in terms of kdb/q experience to work together on the project. This is thanks to the different levels of integration that PyKX has and their compatibility with each other. It has also introduced less experienced team members to kdb/q in a language friendly way. Even finally, the code was migrated again this time to pykx from the q side.
+In the end, the project was a success: it was possible to convert a code with a chaotic organization and performance problems, into a concise and understandable one accelerated thanks to Kdb+/q. PyKX has allowed a heterogeneous team in terms of Kdb+/q experience to work together on the project. This is thanks to the different levels of integration that PyKX has and their compatibility with each other. It has also introduced less experienced team members to Kdb+/q in a language friendly way. Even finally, the code was migrated again this time to pykx from the q side.
 
 The pykx.q library allows, as we have discussed earlier, to use existing Python codebases. This feature is really useful, specially when dealing with code migrations from Python. In our experience, we found specially tough to match the Python input shape to the one converted from q. After converting to Python with `.pykx.set` we often had to mess around with this transformed objects inside the Python environment or change the default conversion type to match it with the expected input the Python function needed. Once that was dealt with, the experience using this library was really nice and technically impressive.
 
-Since the data we needed to transfer back and forth between memory spaces was not that big (we were cautious this was the case) we didn't notice a performance loss at all but a great improvement compared to Pandas.
+Since the data we needed to transfer back and forth between memory spaces was not that big (we were cautious this was the case) we didn't notice a performance loss at all. Instead, we achieved a significant improvement compared to Pandas.
 
 Overall we would rate both PyKX libraries highly since it enables users to reuse existing code, reducing the time needed to perform a migration from and to these two languages.

@@ -26,7 +26,8 @@ In this technical report, we will outline the process of migrating our code to t
   [**PyKX saving the day!**](#t21)   
   [**Datasets**](#t23)   
   [**Model**](#t24)   
-[**Qholic**](#t3)
+[**Q Migration**](#t3)
+[**Final thoughts**](#t4)
 
 ## Use Case <a class="anchor" id="t11"></a>
 
@@ -1483,7 +1484,7 @@ plt.show()
     
 
 
-# Qholic <a class="anchor" id="t3"></a>
+# Q Migration <a class="anchor" id="t3"></a>
 
 When the team got comfortable with q they started using it almost entirely through `kx.q`, as it was more concise. But the programming became somewhat tedious having to use strings. This is why it was decided to jump to a q environment. But as seen in the previous chapter, there was Python code that the team couldn't port to q. For this reason it was decided to stay in PyKX but this time inside the q environment.
 
@@ -1537,7 +1538,7 @@ res:modelpredict[train[0][3403]];
 
 As for the rest of the code we explained throughout the PyKX migration part, it proved to be quite straightforward, especially when dealing with the code written using `pykx.q()` as strings.
 
-# Final thoughts
+# Final thoughts <a class="anchor" id="t4"></a>
 
 In the end, the project was a success: it was possible to convert a code with a chaotic organization and performance problems, into a concise and understandable one accelerated thanks to Kdb+/q. PyKX has allowed a heterogeneous team in terms of Kdb+/q experience to work together on the project. This is thanks to the different levels of integration that PyKX has and their compatibility with each other. It has also introduced less experienced team members to Kdb+/q in a language friendly way. Even finally, the code was migrated again this time to pykx from the q side.
 

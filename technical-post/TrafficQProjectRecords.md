@@ -26,7 +26,7 @@ In this technical report, we will outline the process of migrating our code to t
   [**PyKX saving the day!**](#t21)   
   [**Datasets**](#t23)   
   [**Model**](#t24)   
-[**Q Migration**](#t3)
+[**Q Migration**](#t3)   
 [**Final thoughts**](#t4)
 
 ## Use Case <a class="anchor" id="t11"></a>

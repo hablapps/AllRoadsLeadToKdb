@@ -133,11 +133,16 @@ The average time for loading and processing a month of traffic information is **
 **Location**
 
 To join the two previous tables we need to know which traffic sensors correspond to the weather stations. To do this you can use a distance matrix and find the closest pairs between these. You could measure this distance directly with the coordinates, but to make the distances more understandable we used the Haversine distance, which calculates the distance in meters between a pair of coordinates. It can be seen in the next heatmap that these distances are between 0 and 20 km:
-
-<figure>
-    <img src="image_source/heatmap3.png">
-    <figcaption style = "text-align: center"> <b>Figure 1:</b> Heatmap of distances in km between weather and traffic stations </figcaption>
-</figure>
+<table>
+    <tr>
+        <td style='text-align:center'>
+            <figure>
+                <img src="image_source/heatmap3.png">
+                <figcaption style = "text-align: center"> <b>Figure 1:</b> Heatmap of distances in km between weather and traffic stations </figcaption>
+            </figure>
+        </td>
+    </tr>
+</table>
 
 ## The Final Table <a class="anchor" id="t14"></a>
 
@@ -188,11 +193,16 @@ Regarding the Rainfall-Load dependency we started seeing that rainy days are ver
 | max   |     10.9       |
 
 We can see in the percentiles of the precipitation column that there are very few recordings with rain. This is why the measurements were divided into different classes depending on the level of rain and we did a separate analysis for the data with heavy rain, moderate to moderate and no rain. The analysis was done hourly to avoid the temporal dependence of the load. We can verify this in the following table, where the average increase in hours of traffic congestion with rain can go from 5% to 14%, which agrees with the studies presented in [The Use Case](#t12).
-
-<figure>
-    <img src="image_source/rainfall.png">
-    <figcaption style = "text-align: center"> <b>Figure 4:</b> The average traffic load per hour for the measurements with heavy rain (blue), moderate rain (brown) and no rain (green).</figcaption>
-</figure>
+<table>
+    <tr>
+        <td style='text-align:center'>
+            <figure>
+                <img src="image_source/rainfall.png">
+                <figcaption style = "text-align: center"> <b>Figure 4:</b> The average traffic load per hour for the measurements with heavy rain (blue), moderate rain (brown) and no rain (green).</figcaption>
+            </figure>
+        </td>
+    </tr>
+</table>
 
 To verify that these differences between groups are significant, we can perform an anova test. And we see that in all hours there is great evidence that the load is different between the different levels of rain. For example, for hour 12:
 

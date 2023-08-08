@@ -810,7 +810,7 @@ print(kx.q.each(kx.q.raze, kx.q.flip(weather["year", "month", "day"]))[:3])
     "20221222"
 
 
-All that remains is to convert the data type from string to date. Unfortunately, some functions (especially the overloaded glyphs) are not yet implemented. For example cast (`$`), take (`#`), concat (`,`)... So we are forced to abandon pythonic way of calling q functions and perform this casting writing kdb+/q code using the `pykx.q` method:
+All that remains is to convert the data type from string to date. Unfortunately, some functions (especially the overloaded glyphs) are not yet implemented. For example cast (`$`), take (`#`), concat (`,`)... So we are forced to abandon pythonic way of calling q functions and perform this casting writing kdb+/q code using the `pykx.q()` method:
 
 
 ```python
@@ -1495,7 +1495,7 @@ plt.show()
 
 When the team got comfortable with q they started using it almost entirely through `kx.q`, as it was more concise. But the programming became somewhat tedious having to use strings. This is why it was decided to jump to a q environment. But as seen in the previous chapter, there was Python code that the team couldn't port to q. For this reason it was decided to stay in PyKX but this time inside the q environment.
 
-pykx.q allows Python code execution on a q environment and, as a result, it opens up the door for new opportunities when dealing with existing codebases as it allows for importing and using Python libraries, both installed on the system and available as .py files.
+The pykx.q library allows Python code execution on a q environment and, as a result, it opens up the door for new opportunities when dealing with existing codebases as it allows for importing and using Python libraries, both installed on the system and available as .py files.
 
 In our case we use both of these options. We will focus only on the opportunities we found to use Python code with pykx.q and leave the link to the project's [q script]() for the interested reader.
 

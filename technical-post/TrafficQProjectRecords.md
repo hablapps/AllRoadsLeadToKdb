@@ -619,19 +619,6 @@ traffic_station.pd().head()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1586,7 +1573,7 @@ When the team got comfortable with the kdb/q language they started using almost 
 
 pykx.q allows Python code execution on a q environment and, as a result, it opens up the door for new opportunities when dealing with existing codebases as it allows for importing and using Python libraries, both installed on the system and available as .py files.
 
-In our case we use both of these options. We will focus in this post on these opportunities to use Python code in pykx.q and leave the link to the project's [q script]() for the interested reader.
+In our case we use both of these options. We will focus only on the opportunities we found to use Python code with pykx.q and leave the link to the project's [q script]() for the interested reader.
 
 First, we want to execute the `haversine_vector` function to measure the distance between coordinates. Since it's not available on q, we decided to use pykx.q to incorporate this library straight into our q code with these lines:
 

@@ -37,7 +37,7 @@ Although this project is novel in the city of Madrid, there are many articles th
 
 There are many studies regarding the dependence of the weather on traffic, especially focused on rainfall. None of the studies are carried out in Madrid, but rather in several large cities such as Manchester ([A. Essien et al.](https://pure.manchester.ac.uk/ws/portalfiles/portal/72721911/DEXA_Camera_8_pages.pdf)), Shenzhen ([Y. Yao et al.](https://ieeexplore.ieee.org/document/8964560)) or Belgrade ([M. Vidas et al.](https://www.safetylit.org/citations/index.php?fuseaction=citations.viewdetails&citationIds[]=citjournalarticle_716898_14)). The results of these studies predict a 5-15% increase in traffic volume on weekdays during peak hours.
 
-Regarding the use of PyKX on Pandas we can find several blogs in [KX developer] (https://kx.com/resources/developer-blog/) such as [A. Morrison](https://kx.com/blog/accelerating-python-workflows-using-pykx/) where he uses PyKX in the field of financial services. This article shows a big speed advantage of PyKX over Pandas.
+Regarding the use of PyKX on Pandas we can find several blogs in [KX developer](https://kx.com/resources/developer-blog/) such as [A. Morrison](https://kx.com/blog/accelerating-python-workflows-using-pykx/) where he uses PyKX in the field of financial services. This article shows a big speed advantage of PyKX over Pandas.
 
 ## Input Data <a class="anchor" id="t12"></a>
 

@@ -1,0 +1,2 @@
+Requirement already up-to-date: jinja2 in c:\users\marco\anaconda3\lib\site-packages (3.1.2)
+Requirement already satisfied, skipping upgrade: MarkupSafe>=2.0 in c:\users\marco\anaconda3\lib\site-packages (from jinja2) (2.1.1)

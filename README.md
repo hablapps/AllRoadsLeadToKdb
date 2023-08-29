@@ -1,7 +1,25 @@
 # All Roads Lead To PyKX
 
-This repo contains all the files that give context to our [first post](first-post/AllRoadsLeadToPyKX.md) and its [technical coutnerpart](technical-post/) (LINK TECH POST ONCE ITS HTML IS GENERATED !!!!).
+This repository contains the source code for the posts on PyKX published on Habla Computings's blog: 
 
-[PyKX 1.6](https://code.kx.com/pykx/1.6/getting-started/installing.html) needs to be installed in order to run the Python code and [pykx.q](https://code.kx.com/pykx/1.6/api/pykx_under_q.html) as well for running the q code. Of course, to run q code you need [q](https://code.kx.com/q/learn/install/) installed.
+* [All Roads Lead to PyKX](https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html). An introduction to the PyKX library narrated by Emma Monad, a fictional character who plays the role of CTO at the equally fictional company Mad Flow.
 
-To obtain the source data files in CSV format, follow the posts' instructions and place them where the code needs them to be. If placed elsewhere, you will need to change the read paths on the source code.
+*  [All Roads Lead to PyKX: the technical counterpart](https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html). An in-depth technical description of the use case and PyKX code introduced in the last post. It's intended to serve as a PyKX migration guide for programmers. 
+
+## Content
+
+* `posts/AllRoadsLeadToPyKX.md`.  Markdown source of Emma Monad's blog post. 
+
+* `posts/AllRoadsLeadToPyKX-Technical.ipynb`. Literate Python/PyKX code for the technical blog post.
+
+* `src/pandas`, `src/pykx`, `src/pykx.q`. The three versions of the implementation of the Mad Flow use case: the original and inefficient Pandas version; its migration into PyKX/Python; and its migration into PyKX/Q.
+
+
+
+## Running code
+
+Running the Code:
+
+- To execute the Python code, you need [PyKX 1.6](https://code.kx.com/pykx/1.6/getting-started/installing.html) installed. Additionally, for running the q code, you'll need [pykx.q](https://code.kx.com/pykx/1.6/api/pykx_under_q.html) as well as [q](https://code.kx.com/q/learn/install/) installed.
+
+- To obtain the source data files in CSV format, which are essential for running the notebook and the Python/Q files, please follow the instructions provided in the technical post. Ensure to place these files in the `./data` directory.

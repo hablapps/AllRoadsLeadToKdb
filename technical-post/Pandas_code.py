@@ -93,7 +93,7 @@ weather = weather.drop(["index", "magnitud", "value"], axis=1).groupby([ "date",
  
 # In the first place, the rows where the data collection has had an error are eliminated, for this we filter the values without measurement errors. In the documentation they tell us that these values are represented with an "N".
 
-# Quitar datos con errores
+# Remove data with errors
 traffic= traffic[traffic["error"] == "N"].rename(columns={"carga":"load", "id":"traffic_station"})
 
 
@@ -101,7 +101,7 @@ traffic= traffic[traffic["error"] == "N"].rename(columns={"carga":"load", "id":"
 
 # String a fecha
 traffic['date'] = pd.to_datetime(traffic['fecha'], errors='coerce')
-# Eliminar columnas innecesarias
+# Remove unnecessary columns
 traffic.drop(["tipo_elem", "error", "periodo_integracion", "fecha", "intensidad", "ocupacion", "vmed"], axis=1, inplace=True)
 
 
@@ -165,8 +165,6 @@ complete["hour"] = complete["date"].dt.hour
 
 # ## Month 5: Data interpretation
 
-# Durante este mes el equipo ha trabajado en analizar si el clima tiene relación con el tráfico y si esta dependencia es lo suficientemente apreciable como para tenerla en cuenta en nuestro modelo. En este record mostramos los resultados para precipitación aunque se ha realizado un estudio similar con el resto de condiciones meteorológicas. Pero antes filtramos las horas y días con más tráfico. Los días lectivos suelen tener más tráfico que los días festivos. Así como de día suele haber más tráfico que de noche. En la siguiente figura podemos comprobarlo. De lunes a viernes hay más tráfico y de 11 a 20 también. Vemos entonces que existe una fuerte estacionalidad en los datos.
-
 import matplotlib.pyplot as plt
 
 load_per_hour = complete.groupby("hour")["load"].mean().values
@@ -176,35 +174,23 @@ plt.xlabel("Hour")
 plt.show()
 
 
-# Los días lectivos suelen tener más tráfico que los días festivos. Así como de día suele haber más tráfico que de noche. En la siguiente figura podemos comprobarlo. De lunes a viernes hay más tráfico y de 11 a 20 también. Vemos entonces que existe una fuerte estacionalidad en los datos.
-
 load_per_weekday = complete.groupby("weekday")["load"].mean().values
 plt.bar(np.arange(len(load_per_weekday)), load_per_weekday.reshape(-1))
 plt.ylabel("Load")
 plt.xlabel("Weekday")
 plt.show()
 
-
-# Como se puede comprobar los principales problemas de carga se dan entre las 10 a las 20 y de lunes a viernes.
+ 
 
  
 final = complete[(complete["weekday"]<5) & (complete["hour"]>9) & (complete["hour"]<20)].reset_index()
 
 
 # **Rainfall-Load dependency**
-
-# Ahora sí presentamos los resultados del análisis de la dependencia de la precipitación sobre el tráfico. 
-
-print(complete[["rainfall"]].describe(percentiles=[.9, .999]).to_markdown())
-
-
-# Podemos ver en los percentiles de la columna precipitación que hay muy pocas grabaciones con lluvia. Es por esto que se dividieron en distintas clases las mediciones dependiendo del nivel de lluvia e hicimos un análisis por separado:
-
+ 
 final["rainfall_m"] = pd.cut(final["rainfall"], [-1, 0.1, 1, np.inf], labels=["Normal","Wet", "Heavy"])
 
-
-# El análisis se hizo por horas para evitar la dependencia temporal de la carga. Podemos comprobar esto en la siguiente tabla donde el incremento de la media en horas de la congestión de tráfico con lluvia puede ir del 5% al 14%, lo que concuerda con los  estudios presentados en el record [Month 1: Some Reading](#t12).
-
+ 
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import matplotlib.pyplot as plt
@@ -223,70 +209,64 @@ plt.xlabel("hour")
 plt.show()
 
 
-# Para comprobar que estas diferencias entre grupos son significativas podemos hacer un test anova. Y vemos que en todas las horas existe una gran evidencia de que la carga es diferente entre los distintos tipos de lluvia. Por ejeplo, para la hora 12:
-
+ 
 from statsmodels.formula.api import ols
 import statsmodels.api as sm
 
 model = ols('load ~ C(rainfall)', data=final[final["hour"]==12]).fit()
 anova_table = sm.stats.anova_lm(model, typ=2)
 print(anova_table.to_markdown())
-
-
-# Se decidió incluir la precipitación detro del modelo. El resto de condiciones meteorológicas no diereon un resultado tan claro por lo que se dejarán al margen.
-
+ 
 # ## Month 6:  Playing with the Model
 
-# En este record se presenta un modelo de juguete que utiliza los datos de una sola estación. Utilizamos una red neuronal LSTM de una capa con 5 pasos ..precedidos..  
-
+# This record presents a toy model that uses data from a single station. We use a one-layer LSTM neural network with 5 preceded steps.
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Filtrar:
+# Filter:
 
 final = complete[(complete["weekday"]<5) & (complete["hour"]>9) & (complete["hour"]<20)].reset_index()
 final = final[final.groupby('traffic_station')['load'].transform('mean') >= 40]
 
-# Modificar. 
+# Modify. 
 final["load"]/=100
 scaler = MinMaxScaler()
 final[["rainfall", "temperature"]] = scaler.fit_transform(final.iloc[:, [5,7]])
 
-# Crear entrada:
-    # Estación de tráfico 0: [datos_t0, datos_t1, datos_t2, datos_t3, ...]
-    # Estación de tráfico 1: [datos_t0, datos_t1, datos_t2, datos_t3, ...]
+# Create input:
+    # traffic_station 0: [data_t0, data_t1, data_t2, data_t3, ...]
+    # traffic_station 1: [data_t0, data_t1, data_t2, data_t3, ...]
     # ...
 
 final = final.set_index(['date'])
 
-# De paso creo ya el train y test.
-# los primeros datos para train y luego a partir del 80 para test
+# the first data for train and then from 80 for test
 # 5: Rainfall, 12: Load, 13: Hour, 14: Weekday
 train = final.groupby('traffic_station').apply(lambda x: np.array(x[:-80])[:,[2, 7,11,12]].astype(float))
 test  = final.groupby('traffic_station').apply(lambda x: np.array(x[-80:])[:,[2, 7,11,12]].astype(float))
 
 # Separar en Windows, Entrada: La estacion, el dataset y los pasos hacia atras.
-# La salida: Matriz con shape: Las mediciones que se han hecho en el dataset - los pasos hacia atras, 
+# The output: Matrix with shape: The measurements that have been made on the dataset - the steps back,
                             #  los pasos hacia atras,
-                            #  los parametros.
+                            #  the parameters.
 def time_window(traffic_station, dataset, look_back=5):
     data_X,  data_y= [], []
-    # Datos estacion
+    # station data
     station_data = dataset[traffic_station]
     
-    # Por cada dato en la estacion
+    # for each station
     for i in range(len(station_data)-look_back-1):
-        # Guardamos en x una matriz con los datos de las últimas 5 rows (Esto es lo complicado)
+        # We save in x a matrix with the data of the last 5 rows
         data_X.append(station_data[i:(i+look_back)])
-        # Guardamos en y el último dato de load. Esto en verdad son los load que van desde look_back + 1 hasta el final.
+        # We save in y the last load data. This is actually the load that goes from look_back + 1 to the end.
         data_y.append(station_data[i+look_back+1, 2])
 
     return np.array(data_X), np.array(data_y)
 
-# Utilizamos la funcion
+# Use the function
 train_X, train_y = time_window(3403, train)
 test_X, test_y = time_window(3403, test)
 

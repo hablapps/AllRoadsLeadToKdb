@@ -2,7 +2,6 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "e251a98a",
    "metadata": {},
    "source": [
     "# All Roads Lead to Kdb: the technical counterpart\n",
@@ -261,7 +260,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2c79efba",
    "metadata": {},
    "source": [
     "## PyKX migration <a class=\"anchor\" id=\"t3\"></a>"
@@ -269,7 +267,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "be878aa2",
    "metadata": {},
    "source": [
     "Despite the promising forecasting results yielded by the LSTM model, certain considerations arose concerning the efficiency of the Python code employed for project implementation. After profiling the entirity of the process, we found 4 key areas in which the code was behaving worse than expected:\n",
@@ -315,7 +312,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5869bbc2",
    "metadata": {},
    "source": [
     "First of all we need to install and import PyKX:"
@@ -324,7 +320,6 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "d007dbc9",
    "metadata": {},
    "outputs": [
     {
@@ -350,7 +345,6 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "14b67a8e",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -359,7 +353,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "38612113",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-info\">\n",
@@ -370,7 +363,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dfc586db",
    "metadata": {},
    "source": [
     "## Datasets <a class=\"anchor\" id=\"t31\"></a>"
@@ -378,7 +370,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f09daf6d",
    "metadata": {},
    "source": [
     "Before continuing, be sure to download the [datasets](#t21) required for running the next pieces of code."
@@ -386,7 +377,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b49c0e1a",
    "metadata": {},
    "source": [
     "#### Traffic"
@@ -394,7 +384,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7aefd96b",
    "metadata": {},
    "source": [
     "The preprocessing of the traffic table was one of the most critical parts in terms of time. Later on, we will showcase the improvement in execution time compared to our pure Pandas implementation.\n",
@@ -405,7 +394,6 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "c6acb3cb",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -414,7 +402,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ae7e1553",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100\">\n",
@@ -432,7 +419,6 @@
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "7546a656",
    "metadata": {},
    "outputs": [
     {
@@ -471,7 +457,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e9577ccf",
    "metadata": {},
    "source": [
     "As a result of this process, our table is now a PyKX object:"
@@ -480,7 +465,6 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "89aef455",
    "metadata": {},
    "outputs": [
     {
@@ -500,7 +484,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "218eecef",
    "metadata": {},
    "source": [
     "Let's examine the initial few rows of this table:"
@@ -509,7 +492,6 @@
   {
    "cell_type": "code",
    "execution_count": 6,
-   "id": "aa345ea9",
    "metadata": {},
    "outputs": [
     {
@@ -530,7 +512,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "908d6b8d",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100\">\n",
@@ -547,7 +528,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "51f379bd",
    "metadata": {},
    "source": [
     "We have the `kx.q.qsql` interface integrated in PyKX, which allows us to query into q tables concisely."
@@ -555,7 +535,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d8a61424",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100\">\n",
@@ -603,7 +582,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "30e7b14f",
    "metadata": {},
    "source": [
     "To preprocess the traffic table our objective is to ascertain the average load based on date and season, while eliminating measurement errors. The prowess of qSQL enables us to accomplish this feat through a singular query:"
@@ -612,7 +590,6 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "d9c9c847",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -625,7 +602,10 @@
   {
    "cell_type": "code",
    "execution_count": 14,
-   "id": "02ed7f35",
+<<<<<<< HEAD
+   "id": "1cc16709",
+=======
+>>>>>>> c0647b344d5195f296497724203cc86cdbf6d871
    "metadata": {},
    "outputs": [
     {
@@ -646,7 +626,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c155fa58",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff\">\n",
@@ -680,7 +659,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f42c0fe5",
    "metadata": {},
    "source": [
     "Keyed tables indexing is different; that's why if we want to see the first values of the table, we need to use the   ```#``` (*take*) operator."
@@ -689,7 +667,6 @@
   {
    "cell_type": "code",
    "execution_count": 8,
-   "id": "8a2772b7",
    "metadata": {},
    "outputs": [
     {
@@ -710,7 +687,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ac69b52b",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100\">\n",
@@ -762,7 +738,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f991f02a",
    "metadata": {},
    "source": [
     "#### Weather"
@@ -770,7 +745,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7d81c683",
    "metadata": {},
    "source": [
     "This table, serving as the traffic table, will also be imported into the Python environment. Consequently, it becomes accessible as a Python object, albeit not within q scopes."
@@ -779,7 +753,6 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "7cac0ae6",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -788,7 +761,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d539fa84",
    "metadata": {},
    "source": [
     "To display a table in markdown format, we can transfer it to Pandas:"
@@ -797,7 +769,6 @@
   {
    "cell_type": "code",
    "execution_count": 10,
-   "id": "030a8818",
    "metadata": {},
    "outputs": [
     {
@@ -952,7 +923,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7d397c5c",
    "metadata": {},
    "source": [
     "As is evident, these objects are not currently within the q memory space. Let's proceed to explore how we can access and leverage q features on these objects. First, we will examine the straightforward `xcol` function, which affords us the ability to rename columns:"
@@ -961,7 +931,6 @@
   {
    "cell_type": "code",
    "execution_count": 11,
-   "id": "a35cf269",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -970,7 +939,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "47a11bbb",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%;  border-top: 3px solid #00b100\">\n",
@@ -999,7 +967,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dba475a3",
    "metadata": {},
    "source": [
     "With the following code we have removed several columns that are not relevant to the analysis."
@@ -1008,7 +975,6 @@
   {
    "cell_type": "code",
    "execution_count": 12,
-   "id": "6f559934",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1017,7 +983,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "93c5c6b9",
    "metadata": {},
    "source": [
     "The next step involves merging the year, month, and day columns into a single unified date column. To initiate this process, we begin by accessing these three individual columns. This can be accomplished through indexing:"
@@ -1026,7 +991,6 @@
   {
    "cell_type": "code",
    "execution_count": 13,
-   "id": "9c952877",
    "metadata": {},
    "outputs": [
     {
@@ -1045,7 +1009,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4a530359",
    "metadata": {},
    "source": [
     "We observe that the outcome consists of three lists, each containing data corresponding to the sample size. The objective is to form a single list of the sample size, wherein the three date elements are combined:"
@@ -1054,7 +1017,6 @@
   {
    "cell_type": "code",
    "execution_count": 14,
-   "id": "d4463a68",
    "metadata": {},
    "outputs": [
     {
@@ -1073,7 +1035,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5faba647",
    "metadata": {},
    "source": [
     "We appear to be approaching the desired outcome. Currently, we possess a list of sample size, wherein each position contains a sub-list comprising three elements: the day, the month, and the year. To consolidate each sub-list into a singular, unified element, the *each* iterator can be used:"
@@ -1082,7 +1043,6 @@
   {
    "cell_type": "code",
    "execution_count": 15,
-   "id": "6e9f1ca3",
    "metadata": {},
    "outputs": [
     {
@@ -1101,7 +1061,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3ccc1ddf",
    "metadata": {},
    "source": [
     "The final step entails converting the resultant data from string format to a date format. However, it's worth noting that certain functions, particularly the overloaded glyphs, have yet to be implemented. For example cast (`$`), take (`#`), concat (`,`)... So we are forced to abandon the pythonic way of calling q functions and perform this casting writing kdb+/q code using the `pykx.q()` method:"
@@ -1110,7 +1069,6 @@
   {
    "cell_type": "code",
    "execution_count": 16,
-   "id": "9739ef93",
    "metadata": {},
    "outputs": [
     {
@@ -1128,7 +1086,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f24a9cd5",
    "metadata": {},
    "source": [
     "Finally, we add this column to our table:"
@@ -1137,7 +1094,6 @@
   {
    "cell_type": "code",
    "execution_count": 17,
-   "id": "7e366cb6",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1146,7 +1102,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e851d1fa",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff\">\n",
@@ -1164,7 +1119,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "40de558d",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #7ca1a1;margin-left: 5%; margin-right: 5%; border-top: 3px solid #7ca1a1\">\n",
@@ -1182,7 +1136,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "fd3652f8",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #ccc2a4; border-left: 3px solid #ccc2a4;margin-left: 5%; margin-right: 5%; border-top: 3px solid #ccc2a4\">\n",
@@ -1200,7 +1153,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b8caa931",
    "metadata": {},
    "source": [
     "Shortly after, some team members started using q code instead of PyKX functions in the pythonic way, as they found the resulting code to be sleeker and more concise. As their familiarity with q grew, they put forth a suggestion to create a function entirely written in q."
@@ -1209,7 +1161,6 @@
   {
    "cell_type": "code",
    "execution_count": 18,
-   "id": "b984407d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1218,7 +1169,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0d496b18",
    "metadata": {},
    "source": [
     "Once again, both solutions are entirely compatible and can even be combined. It's at the programmer's discretion to opt for either approach.\n",
@@ -1229,7 +1179,6 @@
   {
    "cell_type": "code",
    "execution_count": 19,
-   "id": "2477b277",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1238,7 +1187,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5935123c",
    "metadata": {},
    "source": [
     "The current state of the weather table is as follows:"
@@ -1247,7 +1195,6 @@
   {
    "cell_type": "code",
    "execution_count": 20,
-   "id": "797881f3",
    "metadata": {},
    "outputs": [
     {
@@ -1397,7 +1344,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cc56cf70",
    "metadata": {},
    "source": [
     "Now, let's shift our focus towards deconstructing the H* and V* queries into multiple rows, while simultaneously introducing a time column to prevent information gaps. In q, the conventional approach would involve leveraging functional qSQL to extract columns conforming to the aforementioned patterns. However, we will capitalize on the advantage that PyKX offers by incorporating q code via strings to sidestep this method:"
@@ -1406,7 +1352,6 @@
   {
    "cell_type": "code",
    "execution_count": 21,
-   "id": "728e319c",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1418,7 +1363,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2a828db0",
    "metadata": {},
    "source": [
     "The function above accepts a list of columns, a designated pattern for searching, and a q function represented as a string. This function takes the columns found following the specified pattern in qSQL format (where columns are accessed by their names, not symbols) as an argument. When applied to all columns commencing with \"H,\" it yields these columns as a vector of symbols, alongside a string representation of these columns in qSQL format:"
@@ -1427,7 +1371,6 @@
   {
    "cell_type": "code",
    "execution_count": 22,
-   "id": "6091fa6a",
    "metadata": {},
    "outputs": [
     {
@@ -1449,7 +1392,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "91873db7",
    "metadata": {},
    "source": [
     "This capability is remarkably powerful, as it enables the utilization of qSQL alongside variables, obviating the need for functional forms which can often prove intricate for individuals new to kdb+/q development.\n",
@@ -1460,7 +1402,6 @@
   {
    "cell_type": "code",
    "execution_count": 23,
-   "id": "cbca5b61",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1470,7 +1411,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b98f8279",
    "metadata": {},
    "source": [
     "Our next step involves feeding our internally constructed functions, represented as strings, into the qSQL `update` function. This is done in conjunction with the repetition of the 24-hour sequence to match the initial number of rows:"
@@ -1479,7 +1419,6 @@
   {
    "cell_type": "code",
    "execution_count": 24,
-   "id": "c40e5441",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1488,7 +1427,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "12f082f3",
    "metadata": {},
    "source": [
     "To remove columns beginning with **H** or **V**, we can employ the same approach as earlier to circumvent the need for functional qSQL:"
@@ -1497,7 +1435,6 @@
   {
    "cell_type": "code",
    "execution_count": 25,
-   "id": "712df953",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1506,7 +1443,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5bb289e7",
    "metadata": {},
    "source": [
     "Let's see the result:"
@@ -1515,7 +1451,6 @@
   {
    "cell_type": "code",
    "execution_count": 26,
-   "id": "9533cadd",
    "metadata": {},
    "outputs": [
     {
@@ -1612,7 +1547,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6106b1c9",
    "metadata": {},
    "source": [
     "Finally, the remaining task involves expanding the table so that each element within the lists corresponds to a distinct row:"
@@ -1621,7 +1555,6 @@
   {
    "cell_type": "code",
    "execution_count": 27,
-   "id": "a185e603",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1630,7 +1563,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a8c59bd1",
    "metadata": {},
    "source": [
     "We can further streamline the table by eliminating rows that lack validity and merging the date with the time:"
@@ -1639,7 +1571,6 @@
   {
    "cell_type": "code",
    "execution_count": 28,
-   "id": "6f8524a6",
    "metadata": {},
    "outputs": [
     {
@@ -1716,7 +1647,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "fad6c8fa",
    "metadata": {},
    "source": [
     "The **magnitude** column plays a pivotal role in attributing meaning to the **value**. As outlined by the dataset creators, the diverse magnitudes align with the elements encapsulated within the following dictionary:"
@@ -1725,7 +1655,6 @@
   {
    "cell_type": "code",
    "execution_count": 29,
-   "id": "82b864cd",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1741,7 +1670,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "ab5dcabf",
    "metadata": {},
    "source": [
     "We just have to change the key by the value of the dictionary."
@@ -1750,7 +1678,6 @@
   {
    "cell_type": "code",
    "execution_count": 30,
-   "id": "a13b5d47",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1759,7 +1686,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5c6a2bcd",
    "metadata": {},
    "source": [
     "Finally, all we have to do is separate the different weather conditions into different columns:"
@@ -1768,7 +1694,6 @@
   {
    "cell_type": "code",
    "execution_count": 31,
-   "id": "4bf369e1",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1777,7 +1702,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b0fbd539",
    "metadata": {},
    "source": [
     "The `exec` query provides us with the capability to transform a dictionary, stored within a column, into multiple columns. In this transformation, the keys become the column names, and the values constitute the data within those respective columns. This proves particularly beneficial when dealing with a dictionary that represents the weather conditions of each entry, linked with their respective values. By implementing this approach and subsequently grouping the data, we effectively disseminate the weather conditions across distinct columns for each weather entry and weather station."
@@ -1785,7 +1709,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0843ec62",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff\">\n",
@@ -1841,7 +1764,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "eb89abd3",
    "metadata": {},
    "source": [
     "#### Location"
@@ -1849,7 +1771,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "677a023c",
    "metadata": {},
    "source": [
     "Both traffic and weather station tables will be loaded into the q memory space:"
@@ -1858,7 +1779,6 @@
   {
    "cell_type": "code",
    "execution_count": 16,
-   "id": "d2445911",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1868,7 +1788,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "33b3c09d",
    "metadata": {},
    "source": [
     "We are now able to access these objects within q functions without the necessity of passing them as PyKX or Python objects. To illustrate, let's proceed to modify the column names in both tables in order to establish a uniform naming convention:"
@@ -1877,7 +1796,6 @@
   {
    "cell_type": "code",
    "execution_count": 18,
-   "id": "6c5a3528",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1887,7 +1805,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0cbf1e72",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100\">\n",
@@ -1902,7 +1819,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d9cb6e86",
    "metadata": {},
    "source": [
     "Our objective is to merge these two tables. Currently, there appears to be no identifier that readily facilitates a conventional join. Nevertheless, it's worth noting that both the weather and traffic stations are situated by coordinates. We can exploit the spatial proximity between stations designated for measuring traffic and weather to facilitate the join. To compute the distance between two sets of coordinates, the [Harvesine distance](https://en.wikipedia.org/wiki/Haversine_formula) as previously discussed, can be employed. It's important to acknowledge that while this distance function is readily available in Python, it is not natively accessible within q."
@@ -1911,7 +1827,6 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "0a71c287",
    "metadata": {
     "scrolled": true
    },
@@ -1922,7 +1837,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2070e874",
    "metadata": {},
    "source": [
     "One potential approach would involve re-implementing the Haversine distance function in q. However, this might become impractical for more complex libraries. Alternatively, although slower, we could transmit our q objects to Python and work with them there. Nonetheless, it's strongly recommended to avoid switching objects between q and Python. However, the data we had to move between memory spaces wasn't very large (and we were careful about this) and we didn't see any noticeable drop in performance.\n",
@@ -1933,7 +1847,6 @@
   {
    "cell_type": "code",
    "execution_count": 19,
-   "id": "05afc748",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1946,7 +1859,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d9877b87",
    "metadata": {},
    "source": [
     "We've reached a point where we have a matrix detailing the distance in kilometers for every combination of traffic and weather stations. Our upcoming task is to pinpoint pairs of station identifiers that exhibit the minimum distance:"
@@ -1955,7 +1867,6 @@
   {
    "cell_type": "code",
    "execution_count": 20,
-   "id": "0c51ae77",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -1966,7 +1877,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6c6e5673",
    "metadata": {},
    "source": [
     "With this we have a mapping that relates every traffic station to its nearest weather station:"
@@ -1975,7 +1885,6 @@
   {
    "cell_type": "code",
    "execution_count": 22,
-   "id": "7203140e",
    "metadata": {},
    "outputs": [
     {
@@ -2041,7 +1950,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c3c54e13",
    "metadata": {},
    "source": [
     "#### Final Table"
@@ -2049,7 +1957,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "950da21d",
    "metadata": {},
    "source": [
     "Integrating the three tables is a relatively straightforward process. The distances table can be seamlessly merged with either of the other two using a simple left join. However, when joining the traffic and weather tables, an asof join (`aj`) is necessary due to their disparate time intervals. To conclude, two columns, time and day of the week, should be appended to furnish the model with the data's inherent seasonality:"
@@ -2058,7 +1965,6 @@
   {
    "cell_type": "code",
    "execution_count": 55,
-   "id": "05a17234",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2069,7 +1975,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3d1630b6",
    "metadata": {},
    "source": [
     "Let's look at this last table:"
@@ -2078,7 +1983,6 @@
   {
    "cell_type": "code",
    "execution_count": 56,
-   "id": "92446f46",
    "metadata": {},
    "outputs": [
     {
@@ -2251,7 +2155,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2998c540",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff\">\n",
@@ -2283,7 +2186,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "beeeaf88",
    "metadata": {},
    "source": [
     "### Model <a class=\"anchor\" id=\"t32\"></a>"
@@ -2291,7 +2193,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b55416f8",
    "metadata": {},
    "source": [
     "For the model's input, we chose to cherry-pick only the essential columns. Moreover, we apply normalization to the rainfall column using a straightforward MinMax scaler. This function can be included within the q memory space, ready for use whenever necessary:"
@@ -2300,7 +2201,6 @@
   {
    "cell_type": "code",
    "execution_count": 57,
-   "id": "5aa1100f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2317,7 +2217,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7e591be5",
    "metadata": {},
    "source": [
     "Throughout this transition from Pandas, the primary challenge emerged while migrating the `time_window` function, given its reliance on loops. Our approach involved first comprehending the input data, defining the desired output, and then formulating an idiomatic q implementation rather than a direct 1:1 migration. This method proved more time-efficient. \n",
@@ -2327,7 +2226,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2896fa4f",
    "metadata": {},
    "source": [
     "* **sliding window**: given a matrix, x, divides it into chunks of length y:"
@@ -2336,7 +2234,6 @@
   {
    "cell_type": "code",
    "execution_count": 58,
-   "id": "e6b89595",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2345,7 +2242,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "052906f8",
    "metadata": {},
    "source": [
     "* **get target**: For a given matrix, x, it takes the target located in the column z and the first lines are eliminated to match with the chunks length y:"
@@ -2354,7 +2250,6 @@
   {
    "cell_type": "code",
    "execution_count": 59,
-   "id": "c96ce3a1",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2363,7 +2258,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4ac8947b",
    "metadata": {},
    "source": [
     "* **to Matrix**: Transform the table x to a matrix:"
@@ -2372,7 +2266,6 @@
   {
    "cell_type": "code",
    "execution_count": 60,
-   "id": "fc8fb88f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2381,7 +2274,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b6201cbf",
    "metadata": {},
    "source": [
     "* **prepareData**: This function is designed to create the training and testing datasets. It begins by selecting the necessary columns (`columns`) from the table, grouped by traffic station. For each traffic station, it retains `ntest` rows for testing purposes. The data is divided into chunks of length `chunkLen`. Finally, the function constructs a list of dictionaries for training data and training targets (the load column), as well as test data and test targets.\n",
@@ -2396,7 +2288,6 @@
   {
    "cell_type": "code",
    "execution_count": 61,
-   "id": "41197b18",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2411,7 +2302,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "570c36b5",
    "metadata": {},
    "source": [
     "Lets test this function in action with only one station:"
@@ -2420,7 +2310,6 @@
   {
    "cell_type": "code",
    "execution_count": 62,
-   "id": "04456bab",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2438,7 +2327,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "57a4e81b",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-success\" style=\"background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff\">\n",
@@ -2493,7 +2381,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "026e5435",
    "metadata": {},
    "source": [
     "Firstly, we install Tensorflow:"
@@ -2502,7 +2389,6 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "9a27de1d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2511,7 +2397,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d2f380aa",
    "metadata": {},
    "source": [
     "And now we create and train a simple LSTM model:"
@@ -2520,7 +2405,6 @@
   {
    "cell_type": "code",
    "execution_count": 64,
-   "id": "efbe9b8c",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -2545,7 +2429,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "792f6f32",
    "metadata": {},
    "source": [
     "Now we can observe the loss curves for both training and validation over epochs."
@@ -2554,7 +2437,6 @@
   {
    "cell_type": "code",
    "execution_count": 65,
-   "id": "d90d7ee4",
    "metadata": {},
    "outputs": [
     {
@@ -2585,7 +2467,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4f7246e0",
    "metadata": {},
    "source": [
     "And finally, we can see the performance of the model in the following graph:"
@@ -2594,7 +2475,6 @@
   {
    "cell_type": "code",
    "execution_count": 66,
-   "id": "eb419a32",
    "metadata": {},
    "outputs": [
     {
@@ -2620,7 +2500,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d7dc5e20",
    "metadata": {},
    "source": [
     "### Performance gains <a class=\"anchor\" id=\"t33\"></a>"
@@ -2628,7 +2507,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "79299f2c",
    "metadata": {},
    "source": [
     "As discussed earlier, all 4 bottlenecks were solved by migrating to the kdb+/q environment taking advantage of PyKX. Overall, the final picture looks like this:\n",
@@ -2646,7 +2524,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b522a5be",
    "metadata": {},
    "source": [
     "<div class=\"alert alert-block alert-info\">\n",
@@ -2656,7 +2533,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "91f0090c",
    "metadata": {},
    "source": [
     "## pykx.q migration <a class=\"anchor\" id=\"t4\"></a>"
@@ -2664,7 +2540,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5e81d5b6",
    "metadata": {},
    "source": [
     "\n",
@@ -2716,7 +2591,6 @@
     "Notice the backtick at the end, this is for converting back to a q type.\n",
     "\n",
     "\n",
-    "\n",
     "The other way we can run Python code is to load a .py (renamed to .p) file using `\\l`. This could be done as follows:\n",
     "\n",
     "```q\n",
@@ -2747,7 +2621,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "31628903",
    "metadata": {},
    "source": [
     "## Final thoughts v1 <a class=\"anchor\" id=\"t5\"></a>\n",
@@ -2763,7 +2636,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0a55ce42",
    "metadata": {},
    "source": [
     "## Final thoughts v2 <a class=\"anchor\" id=\"t5\"></a>\n",
@@ -2799,7 +2671,6 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4b5cbbd1",
    "metadata": {},
    "source": [
     "## Bibliography <a class=\"anchor\" id=\"t5\"></a>\n",
@@ -2831,7 +2702,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.8.16"
+   "version": "3.7.6"
   }
  },
  "nbformat": 4,

@@ -1,11 +1,3 @@
----
-layout: post
-title: "All roads lead to PyKX"
-author: Jesús López-González
-image: /img/destino.jpg
-toc: true
----
-
 # All Roads Lead to Kdb: A Python to Production tale
 
 Introducing Emma Monad, the main character of our story and CTO of Mad Flow, a large and fictional company dedicated to improving the quality of life in Madrid. Emma was facing the real-world challenge of tackling the issue of heavy traffic in the city. However, she found herself grappling with an outdated, ad-hoc constructed, somewhat

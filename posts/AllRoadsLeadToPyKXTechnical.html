@@ -13,6 +13,13 @@
       font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     }
 
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+      max-width: 5em;
+    }
+
     code {
       padding: 2px 4px;
       font-size: 90%;
@@ -221,7 +228,7 @@
       to Kdb: the technical counterpart</h1>
     <p>This post serves as a follow-up to our prior article, <a
         href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/main/posts/AllRoadsLeadToPyKX.md">All
-        Roads Lead to Kdb</a>, where we introduced the utility of the PyKX
+        Roads Lead to PyKX</a>, where we introduced the utility of the PyKX
       library from the perspective of Emma Monad, the CTO of a large fictional
       company known as Mad Flow. In addition to this high-level perspective,
       the focus of this post is on Pythonist programmers who are eager to
@@ -1158,94 +1165,68 @@
     <p>At this point, a fundamental decision had to be made regarding the
       migration strategy. Let's see the four major alternatives with their
       positive and negative points:</p>
-    <p>we may migrate only part of the code or we could entirely forgo
-      Pandas and conduct a complete migration into PyKX.</p>
     <ul>
       <li>
-        <p><strong>Only Data Migration</strong>: As an excellent starting
-          point for the migration process, we can transfer our q objects to Python
-          after loading and leverage all our existing code. For instance, we may
-          use the <code>.pd</code> method, which allows us to convert a PyPX table
-          object into a Pandas dataframe. This approach ensures that our data
-          remains stored within the kdb environment, thus benefitting from its
-          rapid and scalable database capabilities. Although we will lose the
-          processing power of kdb+/q.</p>
-      </li>
-      <li>
-        <p><strong>Partial migration</strong>: Other approach
-          involves identifying the specific points where Pandas experiences the
-          greatest strain. Subsequently, this segments can be migrated to q using
-          PyKX, while leaving the rest of the code intact. This alternative
-          capitalizes on the compatibility features of PyKX, which ensure a
-          seamless interaction between pure Pandas/Numpy and PyKX. This strategy
-          can be particularly effective if the demarcation between computationally
-          demanding and less complex segments is evident. However, this is not
-          always the case, and consequently, the process could entail multiple
-          conversions between Python and q.</p>
-        <p>Moreover, as the <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/performance.html">documentation
-            recommends</a>, we should avoid these kinds of conversions between the
-          realms of Python and Q whenever possible, and for good reasons. To test
-          how much time is lost in these conversions, we moved the weather and
-          traffic tables, as well as a 12-million-row table from a later stage in
-          the process, to Python using the <code>.pd</code> method. The outcomes
-          displayed in the subsequent table led us to dismiss this
-          option.</p>
-      </li>
-    </ul>
-    <table>
-      <thead>
-        <tr class="header">
-          <th></th>
-          <th>Translation time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="odd">
-          <td>Traffic table</td>
-          <td>2.78 s ± 84.9 ms</td>
-        </tr>
-        <tr class="even">
-          <td>Weather table</td>
-          <td>24.6 ms ± 821 µs</td>
-        </tr>
-        <tr class="odd">
-          <td>Final table</td>
-          <td>1 minute 33 s</td>
-        </tr>
-      </tbody>
-    </table>
-    <ul>
-      <li><strong>Pandas API</strong>: A promising alternative to the
-        <code>.pd()</code> method is the PyKX implementation of the <a
-          href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html">Pandas
-          API</a>. However, as we will explore later, even this had to be
-        discarded for our particular case.
-      </li>
-      <li><strong>Complete Migration</strong>: Full code migration to PyKX
-        allows you to fully exploit the strengths of kdb+/q processing without
-        having to resort to switching between memory spaces. This solution is
-        appropriate when you have large tables. In our case a complete migration
-        to PyKX became imperative. This may seem as a daunting task, but, as we
-        will see, with a little knowledge of q this will be like a nice
-        walk.</li>
-    </ul>
-    <div class="alert alert-block alert-success"
-      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
-      <div class="alert-header custom-card-header"
-        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
-        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
-        on <a href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/creating.html">Python/Q transformations </a>
-      </div>
-      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
-        <p
-          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
-          Objects from q can be converted to Pandas with <code>.pd()</code>, to PyArrow with <code>.pa()</code>, to
-          Numpy with <code>.np()</code> and to Python with <code>.py()</code> methods. This flexibility empowers Python
-          developers, especially those new to PyKX, to seamlessly tap into the capabilities of kdb+ databases while
-          acquainting themselves with q.
+        <p><strong>Partial migration</strong>: This approach involves identifying the specific points where Pandas
+          experiences
+          the greatest strain. Subsequently, these segments can be migrated to q using PyKX, while leaving the rest of
+          the code
+          intact. This alternative capitalizes on the compatibility features of PyKX, which ensure a seamless
+          interaction between
+          pure Pandas/Numpy and PyKX. For instance, we may use the <code>.pd()</code> method, which allows us to convert
+          a PyPX table
+          object into a Pandas dataframe. This strategy can be particularly effective if the demarcation between
+          computationally
+          demanding and less complex segments is evident. However, this isn't always the case, leading to multiple
+          conversions
+          between Python and q. Furthermore, as recommended by the <a
+            href="https://code.kx.com/pykx/1.6/user-guide/advanced/performance.html">
+            documentation recommends</a>, we should minimize these Python-to-Q conversions whenever feasible.</p>
+        <p>To test how much time is lost in these conversions, we moved the weather and traffic tables,
+          as well as a 12-million-row table from a later stage in the process, to Python using the <code>.pd()</code>
+          method.
+          The outcomes displayed in the subsequent table led us to dismiss this option.</p>
+
+
+        <table>
+          <thead>
+            <tr class="header">
+              <th></th>
+              <th>Translation time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>Traffic table</td>
+              <td>2.78 s ± 84.9 ms</td>
+            </tr>
+            <tr class="even">
+              <td>Weather table</td>
+              <td>24.6 ms ± 821 µs</td>
+            </tr>
+            <tr class="odd">
+              <td>Final table</td>
+              <td>1 minute 33 s</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>A promising alternative to this intermediate transformations method is the PyKX implementation of the
+          <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html">Pandas API</a>. However,
+          as we will explore later, even this had to be discarded for our particular case.
         </p>
-      </div>
-    </div>
+      </li>
+      <br>
+      <li><strong>Complete Migration</strong>: An excellent starting point for the migration process involves
+        transferring our
+        data to the q environment. We can even revert these objects to Pandas and leverage all our existing code.
+        This approach ensures that our data remains stored within the kdb environment, thus benefitting from its rapid
+        and scalable
+        database capabilities. However, it's important to acknowledge that we might sacrifice the processing prowess of
+        kdb+/q.
+        As a result, we will proceed with deeper steps in the migration process.</li>
+    </ul>
+
     <p>Let's get started!</p>
     <div class="alert">
       <b> 🔍 You can find on Github the <a
@@ -1279,6 +1260,13 @@
     <h2 id="datasets-">Datasets <a class="anchor" id="t31"></a></h2>
   </div>
   <div id="f09daf6d" class="margin">
+    <p>An excellent starting point for the migration process involves transferring our data to the q environment.
+      We can even revert these objects to Pandas and leverage all our existing code. This approach ensures that our
+      data remains stored within the kdb environment, thus benefitting from its rapid and scalable database
+      capabilities.
+      However, it's important to acknowledge that we might sacrifice the processing prowess of kdb+/q. As a result, we
+      will
+      proceed with deeper steps in the migration process.</p>
     <p>Before continuing, be sure to download the <a href="#t21">datasets</a> required for running the next pieces of
       code.</p>
   </div>
@@ -1607,6 +1595,23 @@
     <div class="sourceCode" id="cb11">
       <pre
         class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>weather[:<span class="dv">3</span>].pd()</span></code></pre>
+    </div>
+  </div>
+  <div class="alert alert-block alert-success"
+    style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+    <div class="alert-header custom-card-header"
+      style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+      <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+      on <a href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/creating.html">Python/Q transformations </a>
+    </div>
+    <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+      <p
+        style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+        Objects from q can be converted to Pandas with <code>.pd()</code>, to PyArrow with <code>.pa()</code>, to
+        Numpy with <code>.np()</code> and to Python with <code>.py()</code> methods. This flexibility empowers Python
+        developers, especially those new to PyKX, to seamlessly tap into the capabilities of kdb+ databases while
+        acquainting themselves with q.
+      </p>
     </div>
   </div>
   <div id="7d397c5c" class="margin">
@@ -2693,7 +2698,7 @@
       importing PyKX, enabling a flag and getting the input tables as PyKX
       objects. However, since we relied on operations such as
       <code>group_by</code> and <code>melt</code>, it ended up being
-      unfeasible since this operations were not yet implemented and we would
+      unfeasible since these operations were not yet implemented and we would
       have to manually code them, which would take a long time on itself. We
       should note, however, that this feature is still on beta, so we look
       forward to future improvements in this regard since it would make
@@ -2703,6 +2708,7 @@
     <p>In summary, with the experience we gained we dare to recommend you
       following these steps as a PyKX migration guide:</p>
     <ol>
+      <li>Migrate the original data to a kdb+/q environment or PyKX objects.</li>
       <li>Profile the original code to locate bottlenecks. This allows us to
         put the focus on the heavier parts of our process.</li>
       <li>Once located, migrate those parts alone to PyKX. You

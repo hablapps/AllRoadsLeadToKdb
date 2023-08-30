@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>TrafficQProjectRecords</title>
+  <style>
+    code{
+      font-family: monospace, monospace;
+      font-size: 1em;
+    }
+    code{
+      font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    }
+
+    code {
+      padding: 2px 4px;
+      font-size: 90%;
+      color: #c7254e;
+      background-color: #f9f2f4;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+
+    pre code {
+      padding:0;
+      margin-bottom: 20px;
+      font-size: inherit;
+      color: inherit;
+      background-color: transparent;
+      white-space: pre-wrap;
+      border-radius: 0;
+    }
+
+    code span.al {
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    /* Alert */
+    code span.an {
+      color: #60a0b0;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    /* Annotation */
+    code span.at {
+      color: #7d9029;
+    }
+
+    /* Attribute */
+    code span.bn {
+      color: #40a070;
+    }
+
+    /* BaseN */
+    code span.bu {
+      color: #008000;
+    }
+
+    /* BuiltIn */
+    code span.cf {
+      color: #007020;
+      font-weight: bold;
+    }
+
+    /* ControlFlow */
+    code span.ch {
+      color: #4070a0;
+    }
+
+    /* Char */
+    code span.cn {
+      color: #880000;
+    }
+
+    /* Constant */
+    code span.co {
+      color: #60a0b0;
+      font-style: italic;
+    }
+
+    /* Comment */
+    code span.cv {
+      color: #60a0b0;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    /* CommentVar */
+    code span.do {
+      color: #ba2121;
+      font-style: italic;
+    }
+
+    /* Documentation */
+    code span.dt {
+      color: #902000;
+    }
+
+    /* DataType */
+    code span.dv {
+      color: #40a070;
+    }
+
+    /* DecVal */
+    code span.er {
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    /* Error */
+    code span.ex {}
+
+    /* Extension */
+    code span.fl {
+      color: #40a070;
+    }
+
+    /* Float */
+    code span.fu {
+      color: #06287e;
+    }
+
+    /* Function */
+    code span.im {
+      color: #008000;
+      font-weight: bold;
+    }
+
+    /* Import */
+    code span.in {
+      color: #60a0b0;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    /* Information */
+    code span.kw {
+      color: #007020;
+      font-weight: bold;
+    }
+
+    /* Keyword */
+    code span.op {
+      color: #666666;
+    }
+
+    /* Operator */
+    code span.ot {
+      color: #007020;
+    }
+
+    /* Other */
+    code span.pp {
+      color: #bc7a00;
+    }
+
+    /* Preprocessor */
+    code span.sc {
+      color: #4070a0;
+    }
+
+    /* SpecialChar */
+    code span.ss {
+      color: #bb6688;
+    }
+
+    /* SpecialString */
+    code span.st {
+      color: #4070a0;
+    }
+
+    /* String */
+    code span.va {
+      color: #19177c;
+    }
+
+    /* Variable */
+    code span.vs {
+      color: #4070a0;
+    }
+
+    /* VerbatimString */
+    code span.wa {
+      color: #60a0b0;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    .alert {
+      color: #31708f;
+      background-color: #d9edf7;
+      border-color: #bce8f1;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+    }
+    
+    div.margin {
+      margin-bottom: 10px;
+      margin-top: 10px;
+    }
+
+    table {overflow: scroll;}
+
+    /* Warning */
+  </style>
+  <!-- Latest compiled and minified Bootstrap CSS -->
+  <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" />-->
+</head>
+
+<body>
+  <div id="e251a98a" class="margin">
+    <h1 id="all-roads-lead-to-kdb-the-technical-counterpart">All Roads Lead
+      to Kdb: the technical counterpart</h1>
+    <p>This post serves as a follow-up to our prior article, <a
+        href="https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html">All
+        Roads Lead to Kdb</a>, where we introduced the utility of the PyKX
+      library from the perspective of Emma Monad, the CTO of a large fictional
+      company known as Mad Flow. In addition to this high-level perspective,
+      the focus of this post is on Pythonist programmers who are eager to
+      explore the technical intricacies that were left unexplained in the
+      aforementioned article. Consequently, the post will provide them with a
+      highly detailed, step-by-step example of how to migrate an existing
+      Python codebase into PyKX. Similarly to the outcomes presented in the
+      post <a href="https://kx.com/blog/accelerating-python-workflows-using-pykx/">Accelerating
+        Python Workflows using PyKX</a>, which we highly recommend reading, we
+      will observe a significant performance advantage of the resulting PyKX
+      code compared to the initial Pandas implementation. More references are
+      available in the bibliography at the end of the post.</p>
+    <p>The structure of the post will be as follows:</p>
+    <ul>
+      <li><a href="#t2"><strong>The Use Case</strong></a>: We will begin by
+        explaining the traffic improvement use case itself, encompassing its
+        objectives, data sources, and anticipated outcomes. This section will
+        also include references to the necessary data sources required to
+        execute all the code provided in this notebook.</li>
+      <li><a href="#t3"><strong>PyKX migration</strong></a>: Subsequently, we
+        will illustrate the process of delegating resource-intensive tasks to
+        kdb+/q using PyKX, all while staying within the Python environment! This
+        kind of PyKX-boosted Pythonic version is probably the fastest way to
+        begin harnessing the capabilities of the kdb+/q environment.</li>
+      <li><a href="#t4"><strong>pykx.q migration</strong></a>: Lastly, we will
+        delve into the process of transitioning the code to pure kdb+/q, while
+        continuing to utilize PyKX to retain the Pythonic code you wish to
+        preserve. This kdb+/q version enhanced by PyKX is presented for those
+        interested in a more extensive adoption of kdb+/q.</li>
+    </ul>
+    <p>The initial section regarding the use case is independent of
+      programming languages and is primarily included for reference purposes.
+      If you're eager to delve directly into the code and begin learning how
+      to migrate pure Pandas-based Python code into PyKX, you can proceed to
+      the <a href="#t3">second section</a> now and revisit the <a href="#t2">first section</a> as necessary.</p>
+    <h2 id="use-case">Use Case<a class="anchor" id="t2"></a></h2>
+    <p>With the aim of predicting traffic congestion in the presence of
+      rain, Mad Flow dedicated significant effort to preparing and integrating
+      weather and traffic data into an LSTM model. This endeavor aligned with
+      other <a href="https://www.mdpi.com/1424-8220/20/13/3749">studies</a>
+      that sought to forecast traffic patterns using LSTM models based on air
+      pollution. Just like findings from studies in cities like such as <a
+        href="https://pure.manchester.ac.uk/ws/portalfiles/portal/72721911/DEXA_Camera_8_pages.pdf">Manchester</a>,
+      <a href="https://ieeexplore.ieee.org/document/8964560">Shenzhen</a> and
+      <a
+        href="https://www.safetylit.org/citations/index.php?fuseaction=citations.viewdetails&amp;citationIds%5B%5D=citjournalarticle_716898_14">Belgrade</a>,
+      our results project a weekday traffic volume increase of 5-15% during
+      peak hours in the presence of rain.
+    </p>
+    <p>Like in most projects related to smart cities, the used data is
+      notable diverse, so it needed a lot of preparatory work. The following
+      sections will detail the data sources, the cleansing and interpretation
+      processes, as well as the used model.</p>
+    <h3 id="data-sources-">Data sources <a class="anchor" id="t21"></a></h3>
+    <p>The <a href="https://datos.madrid.es/portal/site/egob">Madrid City
+        Council</a> provides weather and traffic data, including both real-time
+      and historical records. For the purpose of model training, only the
+      historical data is pertinent. These datasets, formatted as CSV files,
+      are categorized by months spanning from the year 2018 to the
+      present.</p>
+    <div class="alert">
+      <b> 🔍 You can access the different datasets required to run this notebook from the following links:
+        <ul>
+          <li> <a href="https://datos.madrid.es/egob/catalogo/300352-141-meteorologicos-horarios.csv">Weather data</a>
+          <li> <a href="https://datos.madrid.es/egob/catalogo/300360-1-meteorologicos-estaciones.csv">Weather
+              stations</a>
+          <li> <a href="https://datos.madrid.es/egob/catalogo/208627-115-transporte-ptomedida-historico.zip">Traffic
+              data</a>
+          <li> <a href="https://datos.madrid.es/egob/catalogo/202468-170-intensidad-trafico.csv">Traffic stations</a>
+        </ul>
+      </b>
+    </div>
+    <p><strong>Traffic data</strong></p>
+    <p>The traffic sensors are strategically positioned at traffic lights
+      throughout the city of Madrid. The collected data gather together
+      diverse measurements of road conditions, including speed and traffic
+      volume. All of these metrics are encapsulated in the <code>load</code>
+      metric, quantified in percentage terms to denote levels of congestion.
+      The format of the <a
+        href="https://datos.madrid.es/egob/catalogo/208627-115-transporte-ptomedida-historico.zip">traffic
+        table</a> is presented as follows:</p>
+    <table style="width:100%;">
+      <colgroup>
+        <col style="width: 3%" />
+        <col style="width: 14%" />
+        <col style="width: 9%" />
+        <col style="width: 10%" />
+        <col style="width: 9%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
+        <col style="width: 17%" />
+        <col style="width: 15%" />
+      </colgroup>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: right;">traffic_station</th>
+          <th style="text-align: left;">element type</th>
+          <th style="text-align: right;">intensity</th>
+          <th style="text-align: right;">ocupation</th>
+          <th style="text-align: right;">load</th>
+          <th style="text-align: right;">vmed</th>
+          <th style="text-align: left;">error</th>
+          <th style="text-align: right;">integration period</th>
+          <th style="text-align: left;">date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">1001</td>
+          <td style="text-align: left;">M30</td>
+          <td style="text-align: right;">3240</td>
+          <td style="text-align: right;">9</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">59</td>
+          <td style="text-align: left;">N</td>
+          <td style="text-align: right;">5</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">1001</td>
+          <td style="text-align: left;">M30</td>
+          <td style="text-align: right;">3240</td>
+          <td style="text-align: right;">9</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">59</td>
+          <td style="text-align: left;">N</td>
+          <td style="text-align: right;">5</td>
+          <td style="text-align: left;">2022-12-01 00:15:00</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: right;">1001</td>
+          <td style="text-align: left;">M30</td>
+          <td style="text-align: right;">300</td>
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">66</td>
+          <td style="text-align: left;">N</td>
+          <td style="text-align: right;">5</td>
+          <td style="text-align: left;">2022-12-01 00:30:00</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>This table amass information from various traffic stations, detailing
+      elements such as traffic intensity, occupancy, congestion load, and
+      other relevant data, all correlated with specific dates and times.</p>
+    <p>The table also includes a column for the date and another column that
+      identifies the sensor. This identification will be used to establish a
+      link with its corresponding coordinates by utilizing the subsequent <a
+        href="https://datos.madrid.es/egob/catalogo/202468-170-intensidad-trafico.csv">traffic
+        stations table</a>:</p>
+    <table style="width:100%;">
+      <colgroup>
+        <col style="width: 2%" />
+        <col style="width: 8%" />
+        <col style="width: 8%" />
+        <col style="width: 4%" />
+        <col style="width: 8%" />
+        <col style="width: 39%" />
+        <col style="width: 6%" />
+        <col style="width: 7%" />
+        <col style="width: 7%" />
+        <col style="width: 7%" />
+      </colgroup>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: left;">element type</th>
+          <th style="text-align: right;">district</th>
+          <th style="text-align: right;">id</th>
+          <th style="text-align: left;">code</th>
+          <th style="text-align: left;">name</th>
+          <th style="text-align: right;">utm_x</th>
+          <th style="text-align: right;">utm_y</th>
+          <th style="text-align: right;">Longitude</th>
+          <th style="text-align: right;">Latitude</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: left;">"URB"</td>
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">3840</td>
+          <td style="text-align: left;">"01001"</td>
+          <td style="text-align: left;">"Jose Ortega y Gasset E-O - Pº
+            Castellana-Serrano"</td>
+          <td style="text-align: right;">441615</td>
+          <td style="text-align: right;">4.47577e+06</td>
+          <td style="text-align: right;">-3.68832</td>
+          <td style="text-align: right;">40.4305</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: left;">"URB"</td>
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">3841</td>
+          <td style="text-align: left;">"01002"</td>
+          <td style="text-align: left;">"Jose Ortega y Gasset O-E - Serrano-Pº
+            Castellana"</td>
+          <td style="text-align: right;">441706</td>
+          <td style="text-align: right;">4.47577e+06</td>
+          <td style="text-align: right;">-3.68726</td>
+          <td style="text-align: right;">40.4305</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: left;">"URB"</td>
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">3842</td>
+          <td style="text-align: left;">"01003"</td>
+          <td style="text-align: left;">"Pº Recoletos N-S - Almirante-Prim"</td>
+          <td style="text-align: right;">441319</td>
+          <td style="text-align: right;">4.47484e+06</td>
+          <td style="text-align: right;">-3.69173</td>
+          <td style="text-align: right;">40.4221</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Weather data</strong></p>
+    <p>The table below provides a snapshot of the type of information
+      available in the <a href="https://datos.madrid.es/egob/catalogo/300352-141-meteorologicos-horarios.csv">weather
+        dataset</a>:</p>
+    <table style="width:100%;">
+      <colgroup>
+        <col style="width: 4%" />
+        <col style="width: 23%" />
+        <col style="width: 14%" />
+        <col style="width: 9%" />
+        <col style="width: 11%" />
+        <col style="width: 8%" />
+        <col style="width: 9%" />
+        <col style="width: 8%" />
+        <col style="width: 8%" />
+      </colgroup>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: right;">weather_station</th>
+          <th style="text-align: right;">magnitude</th>
+          <th style="text-align: right;">year</th>
+          <th style="text-align: right;">month</th>
+          <th style="text-align: right;">day</th>
+          <th style="text-align: right;">H01</th>
+          <th style="text-align: right;">V01</th>
+          <th style="text-align: left;">...</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">108</td>
+          <td style="text-align: right;">81</td>
+          <td style="text-align: right;">2022</td>
+          <td style="text-align: right;">12</td>
+          <td style="text-align: right;">22</td>
+          <td style="text-align: right;">270</td>
+          <td style="text-align: right;">N</td>
+          <td style="text-align: left;">...</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">108</td>
+          <td style="text-align: right;">82</td>
+          <td style="text-align: right;">2022</td>
+          <td style="text-align: right;">12</td>
+          <td style="text-align: right;">22</td>
+          <td style="text-align: right;">9</td>
+          <td style="text-align: right;">N</td>
+          <td style="text-align: left;">...</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: right;">108</td>
+          <td style="text-align: right;">83</td>
+          <td style="text-align: right;">2022</td>
+          <td style="text-align: right;">12</td>
+          <td style="text-align: right;">22</td>
+          <td style="text-align: right;">94.7</td>
+          <td style="text-align: right;">N</td>
+          <td style="text-align: left;">...</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">108</td>
+          <td style="text-align: right;">86</td>
+          <td style="text-align: right;">2022</td>
+          <td style="text-align: right;">12</td>
+          <td style="text-align: right;">22</td>
+          <td style="text-align: right;">1031</td>
+          <td style="text-align: right;">N</td>
+          <td style="text-align: left;">...</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">108</td>
+          <td style="text-align: right;">87</td>
+          <td style="text-align: right;">2022</td>
+          <td style="text-align: right;">12</td>
+          <td style="text-align: right;">22</td>
+          <td style="text-align: right;">2</td>
+          <td style="text-align: right;">N</td>
+          <td style="text-align: left;">...</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>This dataset contains hourly meteorological observations, including
+      temperature, humidity, wind speed, and precipitation measurements.</p>
+    <p>Each row documents various details about a specific meteorological
+      station:</p>
+    <ul>
+      <li>The 'magnitude' field denotes the type of meteorological data
+        captured in the corresponding row (e.g., 81 - wind, 82 - direction, ...,
+        89 - rainfall).</li>
+      <li>In the 'H01' and 'V01' columns, the value for the data type
+        specified in the 'magnitude' column is provided, along with its validity
+        status, respectively.</li>
+      <li>The 'year', 'month', and 'day' columns indicate the timestamp of the
+        measurement recording.</li>
+    </ul>
+    <p>Furthermore, we will require the geographical coordinates of the
+      various stations, which are available in a distinct <a
+        href="https://datos.madrid.es/egob/catalogo/300360-1-meteorologicos-estaciones.csv">table</a>
+      provided by the Madrid City Council.</p>
+    <table>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: right;">weather_station</th>
+          <th style="text-align: right;">Longitude</th>
+          <th style="text-align: right;">Latitude</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">-3.71226</td>
+          <td style="text-align: right;">40.4239</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">8</td>
+          <td style="text-align: right;">-3.68232</td>
+          <td style="text-align: right;">40.4216</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: right;">16</td>
+          <td style="text-align: right;">-3.63924</td>
+          <td style="text-align: right;">40.44</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">18</td>
+          <td style="text-align: right;">-3.73184</td>
+          <td style="text-align: right;">40.3948</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">108</td>
+          <td style="text-align: right;">-3.717881</td>
+          <td style="text-align: right;">40.47663</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="data-cleansing-">Data Cleansing
+      <a class="anchor" id="t22"></a>
+    </h3>
+    <p>Upon loading the data, the subsequent task involved its preparation
+      for analysis and modeling. The eventual consolidation of this cleaned
+      data into a unified table will occur during a subsequent phase.</p>
+    <p>After loading the data, the next step was to get it ready for
+      analysis and modeling. Given the diverse nature of the datasets, the
+      process of data cleansing will be conducted individually for each
+      dataset. We'll bring all this cleaned data together into a unified table
+      in a later phase.</p>
+    <h4 id="traffic-data">Traffic Data</h4>
+    <p>The process employed to clean the traffic dataset involves the
+      following steps:</p>
+    <ol>
+      <li>
+        <p>Initially, values characterized by measurement errors are
+          excluded from consideration. The documentation designates these values
+          using the symbol "N".</p>
+      </li>
+      <li>
+        <p>Subsequently, solely the load measurements, which constitute the
+          focus of our analysis, are retained.</p>
+      </li>
+      <li>
+        <p>The data is then grouped based on each date and station,
+          subsequently computing the average load value for each group:</p>
+      </li>
+    </ol>
+    <table>
+      <thead>
+        <tr class="header">
+          <th>date</th>
+          <th>traffic_station</th>
+          <th>traffic_load</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>2022-12-01 00:00:00</td>
+          <td>1001</td>
+          <td>0</td>
+        </tr>
+        <tr class="even">
+          <td>2022-12-01 00:00:00</td>
+          <td>1002</td>
+          <td>0</td>
+        </tr>
+        <tr class="odd">
+          <td>2022-12-01 00:00:00</td>
+          <td>1003</td>
+          <td>0</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4 id="weather-data">Weather Data</h4>
+    <p>Concerning the weather dataset, the procedures undertaken were as
+      follows:</p>
+    <ol>
+      <li>
+        <p>In the weather dataset, the date is split into separate columns
+          for day, month, and year. However, in the traffic dataset, this
+          information is combined. So, we merged the columns to create a single
+          'date' column with the format:" <code>day-month-year</code>.</p>
+      </li>
+      <li>
+        <p>Additionally, given that each individual row contains all 24
+          daily measurements taken at a weather station, along with their
+          respective magnitudes, we need a transformation where each hourly
+          measurement value and its corresponding validity status are discrete
+          entries within separate rows. This presents an opportunity to remove any
+          measurements that are marked as invalid.</p>
+      </li>
+    </ol>
+    <table>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: left;">hour</th>
+          <th style="text-align: right;">value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: left;">0 days 00:00:00</td>
+          <td style="text-align: right;">7.1</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: left;">0 days 00:00:00</td>
+          <td style="text-align: right;">6.8</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: left;">0 days 00:00:00</td>
+          <td style="text-align: right;">2.8</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">3</td>
+          <td style="text-align: left;">0 days 00:00:00</td>
+          <td style="text-align: right;">5.6</td>
+        </tr>
+      </tbody>
+    </table>
+    <ol>
+      <li>
+        <p>To standardize the time measurement format and align it with the
+          traffic table, we merge the date with the time. As a result, the updated
+          date format
+          becomes:<code>date-month-year hour:minute:second</code></p>
+      </li>
+      <li>
+        <p>Lastly, we restructure the diverse types of measurements into
+          distinct columns, enhancing the organizational coherence of the
+          dataset:</p>
+      </li>
+    </ol>
+    <table>
+      <colgroup>
+        <col style="width: 4%" />
+        <col style="width: 16%" />
+        <col style="width: 14%" />
+        <col style="width: 10%" />
+        <col style="width: 9%" />
+        <col style="width: 9%" />
+        <col style="width: 9%" />
+        <col style="width: 7%" />
+        <col style="width: 11%" />
+        <col style="width: 6%" />
+      </colgroup>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: left;">date</th>
+          <th style="text-align: right;">weather_station</th>
+          <th style="text-align: right;">direction</th>
+          <th style="text-align: right;">humidity</th>
+          <th style="text-align: right;">pressure</th>
+          <th style="text-align: right;">rainfall</th>
+          <th style="text-align: right;">solar</th>
+          <th style="text-align: right;">temperature</th>
+          <th style="text-align: right;">wind</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">7.1</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">8</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">67</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">9.4</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">16</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">73</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">8.9</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4 id="location-data">Location Data</h4>
+    <p>To make it easier to combine the tables we mentioned, we need to
+      connect the traffic sensors with the weather stations. To do this, we
+      can use a distance matrix that helps us find the closest pairs of both
+      types of stations. Instead of directly measuring the distance using
+      coordinates, we decided to go with the <a href="https://en.wikipedia.org/wiki/Haversine_formula">Haversine
+        distance</a>. This method calculates the distance in meters between
+      coordinate pairs, which gives a clearer idea of the distances.</p>
+    <p>This visualization is best shown using a heatmap, where the distances
+      are displayed on a range from 0 to 20 kilometers:</p>
+    <figure>
+      <img src="image_source/heatmap3.png">
+      <figcaption style="text-align: center"> <b>Figure 1:</b> Heatmap of distances in km between weather and traffic
+        stations </figcaption>
+    </figure>
+    <p>If we look at the shortest distances between each type of station, we
+      end up with a mapping between these two tables:</p>
+    <table>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: right;">traffic_station</th>
+          <th style="text-align: right;">weather_station</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">3840</td>
+          <td style="text-align: right;">109</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">3841</td>
+          <td style="text-align: right;">109</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: right;">3842</td>
+          <td style="text-align: right;">8</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4 id="the-final-table-">The Final Table
+      <a class="anchor" id="t23"></a>
+    </h4>
+    <p>After we've done all the setup for the three tables - weather,
+      traffic, and distance - we can now put them together. Because the
+      weather table has data every hour, while the traffic data is available
+      every 15 minutes, we'll combine them using an 'asof' join method. Then,
+      we'll add time and day-of-the-week details to the dataset, which will
+      help us study how these factors are connected to traffic congestion.</p>
+    <table>
+      <colgroup>
+        <col style="width: 2%" />
+        <col style="width: 10%" />
+        <col style="width: 9%" />
+        <col style="width: 4%" />
+        <col style="width: 6%" />
+        <col style="width: 5%" />
+        <col style="width: 9%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
+        <col style="width: 6%" />
+        <col style="width: 4%" />
+        <col style="width: 7%" />
+        <col style="width: 4%" />
+        <col style="width: 5%" />
+        <col style="width: 4%" />
+      </colgroup>
+      <thead>
+        <tr class="header">
+          <th style="text-align: right;"></th>
+          <th style="text-align: left;">date</th>
+          <th style="text-align: right;">traffic_station</th>
+          <th style="text-align: right;">load</th>
+          <th style="text-align: right;">Distance</th>
+          <th style="text-align: right;">Closest</th>
+          <th style="text-align: right;">weather_station</th>
+          <th style="text-align: right;">direction</th>
+          <th style="text-align: right;">humidity</th>
+          <th style="text-align: right;">pressure</th>
+          <th style="text-align: right;">rainfall</th>
+          <th style="text-align: right;">solar</th>
+          <th style="text-align: right;">temperature</th>
+          <th style="text-align: right;">wind</th>
+          <th style="text-align: right;">weekday</th>
+          <th style="text-align: right;">hour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: right;">0</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">1001</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">15</td>
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">8</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">67</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">9.4</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">1</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">1002</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">15</td>
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">8</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">67</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">9.4</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">2</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">1003</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">14</td>
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">8</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">67</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">9.4</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: right;">3</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">1006</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">15</td>
+          <td style="text-align: right;">1</td>
+          <td style="text-align: right;">8</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">67</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">9.4</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: right;">4</td>
+          <td style="text-align: left;">2022-12-01 00:00:00</td>
+          <td style="text-align: right;">1009</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">14</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">4</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">7.1</td>
+          <td style="text-align: right;">0</td>
+          <td style="text-align: right;">3</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="data-interpretation-">Data interpretation
+      <a class="anchor" id="t24"></a>
+    </h3>
+    <p>Traffic patterns exhibit a pronounced dependency on time. To dig
+      deeper into the data, a filtering process will be applied to extract
+      instances of peak traffic. This focused dataset will help us really get
+      a better grip on traffic dynamics.</p>
+    <p>The next figures illustrates the outstanding seasonality within the
+      dataset:
+    <table>
+      <tr>
+        <td style='text-align:center;'>
+          <figure>
+            <img src="image_source/loadperhour.png">
+            <figcaption style="text-align: center"> <b>Figure 2:</b> Load per Hour
+            </figcaption>
+          </figure>
+        </td>
+        <td>
+          <figure>
+            <img src="image_source/loadperweekday.png">
+            <figcaption style="text-align: center"> <b>Figure 3:</b> Load per
+              Weekday </figcaption>
+          </figure>
+        </td>
+      </tr>
+    </table>
+    </p>
+    <p>It's clear that weekdays have more traffic compared to holidays.
+      Likewise, during the daytime, there's a higher traffic flow than at
+      nighttime.</p>
+    <p>Concerning the relationship between Rainfall and Load, preliminary
+      observations indicate a limited occurrence of rainy days within our
+      dataset:</p>
+    <table>
+      <thead>
+        <tr class="header">
+          <th style="text-align: left;"></th>
+          <th style="text-align: right;">rainfall</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: left;">count</td>
+          <td style="text-align: right;">841068</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">mean</td>
+          <td style="text-align: right;">0.0130932</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">std</td>
+          <td style="text-align: right;">0.194232</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">min</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">50%</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">90%</td>
+          <td style="text-align: right;">0</td>
+        </tr>
+        <tr class="odd">
+          <td style="text-align: left;">99.9%</td>
+          <td style="text-align: right;">2.9</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">max</td>
+          <td style="text-align: right;">10.9</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>After looking closely at the percentiles of the precipitation column,
+      it's clear that recorded instances of rainfall are quite scarce. To
+      address this limitation, the measurements were divided into distinct
+      categories based on the intensity of the rainfall. This led to a
+      separate analysis for datasets involving heavy rain, moderate rain, and
+      times when there was no rain. This analysis was done hourly, to minimize
+      the impact of time on traffic patterns.</p>
+    <p>The results of this analysis show that on average, traffic congestion
+      increases by around 5% to 14% during rainy hours. This consistently
+      matches the findings discussed in the <a href="#t2">Use Case</a>
+      section.</p>
+    <figure>
+      <img src="image_source/rainfall.png">
+      <figcaption style="text-align: center"> <b>Figure 4:</b> The average traffic load per hour for measurements
+        categorized as heavy rain (blue), moderate rain (brown), and no rain (green):</figcaption>
+    </figure>
+    <p>To confirm the statistical importance of the differences between
+      these groups, we conducted an analysis of variance (ANOVA) test.
+      Notably, the ANOVA results strongly suggest significant variations in
+      load levels among the different rain intensity categories for all hours.
+      For example, let's take a look at the results for hour 12.</p>
+    <table>
+      <thead>
+        <tr class="header">
+          <th style="text-align: left;"></th>
+          <th style="text-align: right;">sum_sq</th>
+          <th style="text-align: right;">df</th>
+          <th style="text-align: right;">F</th>
+          <th style="text-align: right;">PR(&gt;F)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td style="text-align: left;">C(rainfall)</td>
+          <td style="text-align: right;">37650.7</td>
+          <td style="text-align: right;">6</td>
+          <td style="text-align: right;">20.1144</td>
+          <td style="text-align: right;">1.3346e-23</td>
+        </tr>
+        <tr class="even">
+          <td style="text-align: left;">Residual</td>
+          <td style="text-align: right;">8.01363e+06</td>
+          <td style="text-align: right;">25687</td>
+          <td style="text-align: right;">nan</td>
+          <td style="text-align: right;">nan</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>We chose to include rainfall as a factor in the model. However, the
+      other meteorological conditions didn't show similarly clear results, so
+      we decided to leave them out of the model.</p>
+    <h3 id="the-model-">The Model <a class="anchor" id="t25"></a></h3>
+    <p>For the purpose of performance evaluation, a preliminary model was
+      developed employing a basic Long Short-Term Memory (LSTM) architecture
+      with a memory span of 5 steps. The model's objective is to forecast the
+      load at a specific traffic station. The model input encompasses
+      historical load data, rainfall measurements, as well as the hour and day
+      of the week.</p>
+    <p>Preliminary results derived from a single station exhibit promising
+      outcomes, as demonstrated in Figure 6. In this figure, we compare the
+      actual traffic load with the predictions made by the LSTM model.
+      Furthermore, an analysis of the training and validation loss curves
+      (Figure 5) indicates that the model is not experiencing issues related
+      to overfitting or underfitting.</p>
+    <table> <a class="anchor" id="Image61"></a>
+      <tr>
+        <td style='text-align:center;'>
+          <figure>
+            <img src="image_source/loss_graph_p.png">
+            <figcaption style="text-align: center"> <b>Figure 5:</b> Train vs Validation loss curves plot </figcaption>
+          </figure>
+        </td>
+        <td>
+          <figure>
+            <img src="image_source/test_python.png">
+            <figcaption style="text-align: center"> <b>Figure 6:</b> Traffic Forecasting for a traffic station
+            </figcaption>
+          </figure>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div id="2c79efba" class="margin">
+    <h2 id="pykx-migration-">PyKX migration
+      <a class="anchor" id="t3"></a>
+    </h2>
+  </div>
+  <div id="be878aa2" class="margin">
+    <p>Despite the promising forecasting results yielded by the LSTM model,
+      certain considerations arose concerning the efficiency of the Python
+      code employed for project implementation. After profiling the entirity
+      of the process, we found 4 key areas in which the code was behaving
+      worse than expected:</p>
+    <table>
+      <thead>
+        <tr class="header">
+          <th>         </th>
+          <th>Pandas Time    </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>Cleaning Weather</td>
+          <td>247 ms ± 10.4 ms</td>
+        </tr>
+        <tr class="even">
+          <td>Cleaning Traffic</td>
+          <td>25.5 s ± 1.29 s  </td>
+        </tr>
+        <tr class="odd">
+          <td>Join Final Table</td>
+          <td>7.1 s ± 168 ms  </td>
+        </tr>
+        <tr class="even">
+          <td>Model Ingestion Preprocess</td>
+          <td>3.2 s ± 54.2 ms</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>At this point, a fundamental decision had to be made regarding the
+      migration strategy. Let's see the four major alternatives with their
+      positive and negative points:</p>
+    <p>we may migrate only part of the code or we could entirely forgo
+      Pandas and conduct a complete migration into PyKX.</p>
+    <ul>
+      <li>
+        <p><strong>Only Data Migration</strong>: As an excellent starting
+          point for the migration process, we can transfer our q objects to Python
+          after loading and leverage all our existing code. For instance, we may
+          use the <code>.pd</code> method, which allows us to convert a PyPX table
+          object into a Pandas dataframe. This approach ensures that our data
+          remains stored within the kdb environment, thus benefitting from its
+          rapid and scalable database capabilities. Although we will lose the
+          processing power of kdb+/q.</p>
+      </li>
+      <li>
+        <p><strong>Partial migration</strong>: Other approach
+          involves identifying the specific points where Pandas experiences the
+          greatest strain. Subsequently, this segments can be migrated to q using
+          PyKX, while leaving the rest of the code intact. This alternative
+          capitalizes on the compatibility features of PyKX, which ensure a
+          seamless interaction between pure Pandas/Numpy and PyKX. This strategy
+          can be particularly effective if the demarcation between computationally
+          demanding and less complex segments is evident. However, this is not
+          always the case, and consequently, the process could entail multiple
+          conversions between Python and q.</p>
+        <p>Moreover, as the <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/performance.html">documentation
+            recommends</a>, we should avoid these kinds of conversions between the
+          realms of Python and Q whenever possible, and for good reasons. To test
+          how much time is lost in these conversions, we moved the weather and
+          traffic tables, as well as a 12-million-row table from a later stage in
+          the process, to Python using the <code>.pd</code> method. The outcomes
+          displayed in the subsequent table led us to dismiss this
+          option.</p>
+      </li>
+    </ul>
+    <table>
+      <thead>
+        <tr class="header">
+          <th></th>
+          <th>Translation time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>Traffic table</td>
+          <td>2.78 s ± 84.9 ms</td>
+        </tr>
+        <tr class="even">
+          <td>Weather table</td>
+          <td>24.6 ms ± 821 µs</td>
+        </tr>
+        <tr class="odd">
+          <td>Final table</td>
+          <td>1 minute 33 s</td>
+        </tr>
+      </tbody>
+    </table>
+    <ul>
+      <li><strong>Pandas API</strong>: A promising alternative to the
+        <code>.pd()</code> method is the PyKX implementation of the <a
+          href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html">Pandas
+          API</a>. However, as we will explore later, even this had to be
+        discarded for our particular case.
+      </li>
+      <li><strong>Complete Migration</strong>: Full code migration to PyKX
+        allows you to fully exploit the strengths of kdb+/q processing without
+        having to resort to switching between memory spaces. This solution is
+        appropriate when you have large tables. In our case a complete migration
+        to PyKX became imperative. This may seem as a daunting task, but, as we
+        will see, with a little knowledge of q this will be like a nice
+        walk.</li>
+    </ul>
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on <a href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/creating.html">Python/Q transformations </a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          Objects from q can be converted to Pandas with <code>.pd()</code>, to PyArrow with <code>.pa()</code>, to
+          Numpy with <code>.np()</code> and to Python with <code>.py()</code> methods. This flexibility empowers Python
+          developers, especially those new to PyKX, to seamlessly tap into the capabilities of kdb+ databases while
+          acquainting themselves with q.
+        </p>
+      </div>
+    </div>
+    <p>Let's get started!</p>
+    <div class="alert">
+      <b> 🔍 You can find on Github the <a
+          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">Original
+          Python Project</a> that will be migrated into PyKX. </b>
+    </div>
+  </div>
+  <div id="5869bbc2" class="margin">
+    <p>First of all we need to install and import PyKX:</p>
+  </div>
+  <div id="d007dbc9" class="margin">
+    <div class="sourceCode" id="cb1">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install pykx</span></code></pre>
+    </div>
+  </div>
+  <div id="14b67a8e" class="margin">
+    <div class="sourceCode" id="cb2">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pykx <span class="im">as</span> kx</span></code></pre>
+    </div>
+  </div>
+  <div id="38612113" class="margin">
+    <div class="alert">
+      <b> 🔍 A license is required to use some of the following features. You can find more information in the <a
+          href="https://code.kx.com/pykx/1.6/getting-started/installing.html">
+          PyKX installation documentation</a>. </b>
+    </div>
+  </div>
+  <div id="dfc586db" class="margin">
+    <h2 id="datasets-">Datasets <a class="anchor" id="t31"></a></h2>
+  </div>
+  <div id="f09daf6d" class="margin">
+    <p>Before continuing, be sure to download the <a href="#t21">datasets</a> required for running the next pieces of
+      code.</p>
+  </div>
+  <div id="b49c0e1a" class="margin">
+    <h4 id="traffic">Traffic</h4>
+  </div>
+  <div id="7aefd96b" class="margin">
+    <p>The preprocessing of the traffic table was one of the most critical
+      parts in terms of time. Later on, we will showcase the improvement in
+      execution time compared to our pure Pandas implementation.</p>
+    <p>The data loading will be executed employing the utilities facilitated
+      by PyKX:</p>
+  </div>
+  <div id="c6acb3cb" class="margin">
+    <div class="sourceCode" id="cb3">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>traffic <span class="op">=</span> kx.q.read.csv(<span class="st">&#39;../12-2022.csv&#39;</span>, types<span class="op">=</span><span class="st">&quot;IPSIIIISI&quot;</span>, delimiter<span class="op">=</span><span class="st">&#39;;&#39;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="ae7e1553" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on <a href="https://code.kx.com/pykx/1.6/api/read.html">PyKX Read/Write Utils </a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          PyKX provides an array of functions designed to facilitate data loading and writing tasks. These functions
+          encompass the capability to handle diverse file types, spanning both general formats and those specific to the
+          q language. Notably, the q-specific functionalities enable seamless transfer of tables between the q context
+          and the Python context, offering a bidirectional exchange of data. </p>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          Specifically, the parameters of the read.csv function adhere to conventional standards. The file's URL and
+          delimiter are specified. It is important to emphasize the types parameter, which expects the q <a
+            href="https://code.kx.com/q/basics/datatypes/">types</a> associated with each column.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div id="7546a656" class="margin">
+    <div class="sourceCode" id="cb4">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(traffic)</span></code></pre>
+    </div>
+  </div>
+  <div id="e9577ccf" class="margin">
+    <p>As a result of this process, our table is now a PyKX object:</p>
+  </div>
+  <div id="89aef455" class="margin">
+    <div class="sourceCode" id="cb5">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(traffic)</span></code></pre>
+    </div>
+  </div>
+  <div id="218eecef" class="margin">
+    <p>Let's examine the initial few rows of this table:</p>
+  </div>
+  <div id="aa345ea9" class="margin">
+    <div class="sourceCode" id="cb6">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(traffic[:<span class="dv">3</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="908d6b8d" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on <a href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/indexing.html">pythonic indexing in PyKX</a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          Accessing data within PyKX objects, be it lists or tables, follows a methodology analogous to that of Numpy or
+          Pandas. This facilitates the indexing of PyKX objects without necessitating the explicit utilization of q
+          functions. Furthermore, the capacity to index by columns is an additional convenience offered by this
+          approach.</p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> print(weather["H01"][:3]) 
+<div style="color:#808080;display:inline;"> 270 9 94.7 </div></code><br>
+      </div>
+    </div>
+  </div>
+  <div id="51f379bd" class="margin">
+    <p>We have the <code>kx.q.qsql</code> interface integrated in PyKX,
+      which allows us to query into q tables concisely.</p>
+  </div>
+  <div id="d8a61424" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on <a href="https://code.kx.com/pykx/1.6/api/read.html">qSQL</a> and <a
+          href="https://code.kx.com/pykx/1.6/api/read.html">SQL</a> querys
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          PyKX allows you to use qSQL queries using API functions. This includes <code>select</code>, <code>exec</code>,
+          <code>update</code> and <code>delete</code> functions, which share some common characteristics, mainly with
+          the arguments they receive. The first three share roughly this function call structure:
+        </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> kx.q.qsql.{function}({tab}, columns=..., where=..., by=...) </code>
+        <br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          The <code>columns</code> argument expects either a list of strings or a dictionary where the key is the column
+          name and the value is the actual value you want in this column if let's say you want to apply a function to
+          it. Let's see an example:</p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> print(kx.q.qsql.select(weather, {"magnitude": "count distinct magnitude"}, by=["weather_station"])[:3])
+<br><div style="color:#808080;display:inline;"> weather_station| magnitude
+ ---------------| ---------
+ 4              | 1        
+ 8              | 2        
+ 16             | 2     
+</div>         
+</code>
+        <br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          But if you are more familiarized with the q environment it is also possible to use q functions. This approach
+          reduces the verbosity of our functions compared to the equivalent in Python.
+        </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> print(kx.q("{select count distinct magnitude by weather_station from x}", weather)[:3])
+<br> <div style="color:#808080;display:inline;">weather_station| magnitude
+ ---------------| ---------
+ 4              | 1        
+ 8              | 2        
+ 16             | 2 
+</div>    
+</code>
+        <br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          PyKX lets you use ANSI SQL queries too! </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> print(kx.q.sql("SELECT weather_station, COUNT(DISTINCT(magnitude)) FROM &#36 1 GROUP BY weather_station", weather)[:3])
+<br> <div style="color:#808080;display:inline;">weather_station magnitude
+ -------------------------
+ 4               1        
+ 8               2        
+ 16              2             
+</div></code>
+        <br>
+      </div>
+    </div>
+  </div>
+  <div id="30e7b14f" class="margin">
+    <p>To preprocess the traffic table our objective is to ascertain the
+      average load based on date and season, while eliminating measurement
+      errors. The prowess of qSQL enables us to accomplish this feat through a
+      singular query:</p>
+  </div>
+  <div id="d9c9c847" class="margin">
+    <div class="sourceCode" id="cb7">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>traffic <span class="op">=</span> kx.q.qsql.select(traffic,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                         columns <span class="op">=</span> {<span class="st">&#39;traffic_load&#39;</span>: <span class="st">&#39;avg carga&#39;</span>},</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                         by <span class="op">=</span> {<span class="st">&quot;date&quot;</span>:<span class="st">&#39;fecha&#39;</span>, <span class="st">&quot;traffic_station&quot;</span>: <span class="st">&#39;id&#39;</span>}, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                         where <span class="op">=</span> <span class="st">&quot;error=`N&quot;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="02ed7f35" class="margin">
+    <div class="sourceCode" id="cb8">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(kx.q(<span class="st">&quot;3#&quot;</span>,traffic))</span></code></pre>
+    </div>
+  </div>
+  <div id="c155fa58" class="margin">
+    <div class="alert alert-block"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
+      <div class="alert-header custom-card-header"
+        style="background-color: #fad5ff; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
+        Traffic Cleaning
+      </div>
+      <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          Although it may look like a simple query, it is performing a seriously heavy operation. The original Pandas
+          implementation looked like this: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> traffic = traffic[traffic["error"] == "N"].rename(columns={"carga":"load", "id":"traffic_station"})
+ >>> traffic['date'] = pd.to_datetime(traffic['fecha'], errors='coerce')
+ >>> traffic.drop(["tipo_elem", "error", "periodo_integracion", "fecha", "intensidad", "ocupacion", "vmed"], axis=1, inplace=True)
+ >>> traffic.groupby(["date", 'traffic_station']).mean().reset_index()
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          We observe a noticeable improvement in code legibility, especially once you have familiarised a little bit
+          with the qSQL syntax. The code looks sleeker and simpler using PyKX. We noticed a roughly 10x reduction in
+          execution time: </p>
+        <table>
+          <tr style="background-color: #FFFFFF;">
+            <th style="background-color: #fbf1ff;"></th>
+            <th style="background-color:#fbf1ff">Pandas Time</th>
+            <th style="background-color:#fbf1ff">PyKX Time</th>
+          </tr>
+          <tr style="border-top: 1px solid #000000">
+            <td>Cleaning Traffic</td>
+            <td>25.5 s ± 1.29 s</td>
+            <td>1.65 s ± 248 ms</td>
+          </tr>
+        </table><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          This time we achieved both simpler and faster code, which we can agree can be considered as a success.</p>
+      </div>
+    </div>
+  </div>
+  <div id="f42c0fe5" class="margin">
+    <p>Keyed tables indexing is different; that's why if we want to see the
+      first values of the table, we need to use the <code>#</code>
+      (<em>take</em>) operator.</p>
+  </div>
+  <div id="8a2772b7" class="margin">
+    <div class="sourceCode" id="cb9">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(kx.q(<span class="st">&quot;3#&quot;</span>,traffic))</span></code></pre>
+    </div>
+  </div>
+  <div id="ac69b52b" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on Using <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/numpy.html">Numpy</a> and <a
+          href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html">Pandas</a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          For individuals who are still acclimatizing to the kdb+/q ecosystem, a partial adoption of Numpy's
+          functionality remains accessible. Specifically <a
+            href="https://numpy.org/doc/stable/reference/ufuncs.html">universal functions</a>. By using this type of
+          function, the average q function that was employed in the previous query can be rephrased as follows:</p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;color:black"> >>> import numpy as np
+ >>>
+ >>> def npmean(arr):
+ >>>   return np.add.reduce(arr) / len(arr)
+ >>>
+ >>> print(npmean(traffic["load"]))    
+<div style="color:#808080;display:inline;">5.4 </div></code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          While the ability to reuse numpy functions inside q is really nice and can be of great help during a migration
+          like the one we are exemplifying, we found that we were not able to use this numpy function on our
+          <code>kx.q.qsql()</code> query. After executing the previous code, our query would look something like this:
+        </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;color:black">
+ >>> kx.q["npmean"] = npmean 
+ >>> traffic = kx.q.qsql.select(traffic,
+                                columns = {'traffic_load': 'npmean carga'},
+                                by = {"date":'fecha', "traffic_station": 'id'}, 
+                                where = "error=`N")
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          Notice the function called to perform the average of the <code>traffic_load</code> column is the one defined
+          earlier. Even though we didn't get any errors, this resulted in our code running for over 20 minutes with no
+          feedback until we eventually stopped it manually, so we can't recommend the usage Numpy functions inside a
+          qSQL query like we did. We suspect it may have something to do with q's <code>avg</code> function (and all of
+          q's functions) being optimised for this kind of usages and Numpy's implementation not being ready to deal with
+          how kdb+/q implements its tables. It may also have something to do with the <code>group by</code> clause,
+          which creates a keyed table on q, but we can't confirm it as of now.
+        </p>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          On the other hand, Pandas can seamlessly interface with PyKX objects through the Pandas API. This can be
+          effortlessly achieved by importing Numpy and Pandas and toggling a designated flag. We can try to replicate
+          the previous select:</p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;color:black"> >>> import os
+ >>> os.environ['PYKX_ENABLE_PANDAS_API'] = 'true'
+ >>> import numpy as np
+ >>> import pandas as pd
+ >>>
+ >>> print(traffic.iloc[traffic["error"] == "N"][["date", "traffic_station","load"]].head())        
+<br> <div style="color:#808080;display:inline;"> fecha                         id   carga
+----------------------------------------
+2022.12.01D00:00:00.000000000 1001 0    
+2022.12.01D00:15:00.000000000 1001 0    
+2022.12.01D00:30:00.000000000 1001 0    
+2022.12.01D00:45:00.000000000 1001 0    
+2022.12.01D01:00:00.000000000 1001 0     
+</div></code>
+        <br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          However, it's worth noting that the Pandas API is currently under development, hence not all of Pandas
+          functions have been fully incorporated yet. And unfortunately, <code>groupby</code> is one of them. We hope
+          that in the future we can migrate our Pandas code to PyKX without any changes.</p>
+      </div>
+    </div>
+  </div>
+  <div id="f991f02a" class="margin">
+    <h4 id="weather">Weather</h4>
+  </div>
+  <div id="7d81c683" class="margin">
+    <p>This table, serving as the traffic table, will also be imported into
+      the Python environment. Consequently, it becomes accessible as a Python
+      object, albeit not within q scopes.</p>
+  </div>
+  <div id="7cac0ae6" class="margin">
+    <div class="sourceCode" id="cb10">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.read.csv(<span class="st">&#39;../dic_meteo22.csv&#39;</span>, types<span class="op">=</span><span class="st">&#39;I&#39;</span><span class="op">*</span><span class="dv">4</span> <span class="op">+</span> <span class="st">&#39;*&#39;</span><span class="op">*</span><span class="dv">4</span> <span class="op">+</span> <span class="st">&#39;FS&#39;</span><span class="op">*</span><span class="dv">24</span>, delimiter<span class="op">=</span><span class="st">&#39;;&#39;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="d539fa84" class="margin">
+    <p>To display a table in markdown format, we can transfer it to
+      Pandas:</p>
+  </div>
+  <div id="030a8818" class="margin">
+    <div class="sourceCode" id="cb11">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>weather[:<span class="dv">3</span>].pd()</span></code></pre>
+    </div>
+  </div>
+  <div id="7d397c5c" class="margin">
+    <p>As is evident, these objects are not currently within the q memory
+      space. Let's proceed to explore how we can access and leverage q
+      features on these objects. First, we will examine the straightforward
+      <code>xcol</code> function, which affords us the ability to rename
+      columns:
+    </p>
+  </div>
+  <div id="a35cf269" class="margin">
+    <div class="sourceCode" id="cb12">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.xcol({<span class="st">&#39;ANO&#39;</span>: <span class="st">&#39;year&#39;</span>, <span class="st">&#39;MES&#39;</span>: <span class="st">&#39;month&#39;</span>, <span class="st">&#39;DIA&#39;</span>: <span class="st">&#39;day&#39;</span>, <span class="st">&#39;ESTACION&#39;</span>:<span class="st">&#39;weather_station&#39;</span>, <span class="st">&#39;MAGNITUD&#39;</span>:<span class="st">&#39;magnitude&#39;</span>}, weather)</span></code></pre>
+    </div>
+  </div>
+  <div id="47a11bbb" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%;  border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on using <a href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/evaluating.html">q functions in PyKX</a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          A plethora of q functions can be accessed via the <code>pykx.q</code> interface. The attributes mirrored by
+          these functions closely resemble the parameters anticipated by the corresponding q functions, with Python data
+          structures being employed in lieu of q structures. It is important to note that these functions are compiled
+          and thoroughly elucidated within the <a href="https://code.kx.com/pykx/1.6/api/q/q.html"> PyKX
+            documentation</a></p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> kx.q.distinct(['A', 'B', 'B', 'B' ,'C'])
+<samp style="color:#808080;display:inline;"> `A`B`C </samp></code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          For those who want to dig deeper into kdb+/q and gain experience, you can use q functions and pass PyKX
+          objects as arguments: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> kx.q("distinct", ['A', 'B', 'B', 'B' ,'C'])
+<samp style="color:#808080;display:inline;"> `A`B`C </samp></code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          It's important to emphasize that in the preceding function, a Python object is being passed to a q function.
+          When Python objects have a direct equivalent in q, like dictionaries, they can be directly employed as
+          attributes for PyKX functions. Beneath the surface, PyKX adeptly manages the conversion to q data structures.
+        </p>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          Moreover, the application of <a href="https://code.kx.com/q/basics/iteration/">q iterations</a> could be
+          another avenue of exploration: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> kx.q("lower").each(['A', 'B', 'C'])
+<samp style="color:#808080;display:inline;"> `a`b`c </samp></code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          Finally, you can even create functions and use them with PyKX or Python objects.</p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%; color:black"> >>> kx.q("{u !(sum x=) each u:distinct x}", ['A', 'B', 'B', 'B' ,'C'])
+<samp style="color:#808080;display:inline;"> A| 1
+ B| 3
+ C| 1 </samp></code><br>
+      </div>
+    </div>
+  </div>
+  <div id="dba475a3" class="margin">
+    <p>With the following code we have removed several columns that are not
+      relevant to the analysis.</p>
+  </div>
+  <div id="6f559934" class="margin">
+    <div class="sourceCode" id="cb13">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.delete(weather, [<span class="st">&#39;PUNTO_MUESTREO&#39;</span>, <span class="st">&#39;PROVINCIA&#39;</span>, <span class="st">&#39;MUNICIPIO&#39;</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="93c5c6b9" class="margin">
+    <p>The next step involves merging the year, month, and day columns into
+      a single unified date column. To initiate this process, we begin by
+      accessing these three individual columns. This can be accomplished
+      through indexing:</p>
+  </div>
+  <div id="9c952877" class="margin">
+    <div class="sourceCode" id="cb14">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(weather[<span class="st">&quot;year&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;day&quot;</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="4a530359" class="margin">
+    <p>We observe that the outcome consists of three lists, each containing
+      data corresponding to the sample size. The objective is to form a single
+      list of the sample size, wherein the three date elements are
+      combined:</p>
+  </div>
+  <div id="d4463a68" class="margin">
+    <div class="sourceCode" id="cb15">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(kx.q.flip(weather[<span class="st">&quot;year&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;day&quot;</span>])[:<span class="dv">3</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="5faba647" class="margin">
+    <p>We appear to be approaching the desired outcome. Currently, we
+      possess a list of sample size, wherein each position contains a sub-list
+      comprising three elements: the day, the month, and the year. To
+      consolidate each sub-list into a singular, unified element, the
+      <em>each</em> iterator can be used:
+    </p>
+  </div>
+  <div id="6e9f1ca3" class="margin">
+    <div class="sourceCode" id="cb16">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(kx.q.each(kx.q.raze, kx.q.flip(weather[<span class="st">&quot;year&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;day&quot;</span>]))[:<span class="dv">3</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="3ccc1ddf" class="margin">
+    <p>The final step entails converting the resultant data from string
+      format to a date format. However, it's worth noting that certain
+      functions, particularly the overloaded glyphs, have yet to be
+      implemented. For example cast (<code>$</code>), take (<code>#</code>),
+      concat (<code>,</code>)... So we are forced to abandon the pythonic way
+      of calling q functions and perform this casting writing kdb+/q code
+      using the <code>pykx.q()</code> method:</p>
+  </div>
+  <div id="9739ef93" class="margin">
+    <div class="sourceCode" id="cb17">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>date <span class="op">=</span> kx.q(<span class="st">&#39;&quot;D&quot;$&#39;</span>,(kx.q.each(kx.q.raze, kx.q.flip(weather[<span class="st">&quot;year&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;day&quot;</span>]))))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(date[:<span class="dv">3</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="f24a9cd5" class="margin">
+    <p>Finally, we add this column to our table:</p>
+  </div>
+  <div id="7e366cb6" class="margin">
+    <div class="sourceCode" id="cb18">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>weather_ <span class="op">=</span> kx.q.qsql.update(weather, columns <span class="op">=</span> {<span class="st">&#39;date&#39;</span>: date})</span></code></pre>
+    </div>
+  </div>
+  <div id="e851d1fa" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
+      <div class="alert-header custom-card-header"
+        style="background-color: #fad5ff; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
+        Time Join
+      </div>
+      <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          In Pandas, we achieved this by executing this operation on our table: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> pd.to_datetime(weather[["year", "month", "day"]])
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          It seems to be less complicated thanks to having a function that does exactly what we need, whereas in q we
+          had to implement this function ourselves.</p>
+      </div>
+    </div>
+  </div>
+  <div id="b8caa931" class="margin">
+    <p>Shortly after, some team members started using q code instead of PyKX
+      functions in the pythonic way, as they found the resulting code to be
+      sleeker and more concise. As their familiarity with q grew, they put
+      forth a suggestion to create a function entirely written in q.</p>
+  </div>
+  <div id="b984407d" class="margin">
+    <div class="sourceCode" id="cb19">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.update(weather, columns <span class="op">=</span> {<span class="st">&#39;date&#39;</span>:<span class="st">&#39;&quot;D&quot;$ raze each flip(year;month;day)&#39;</span>})</span></code></pre>
+    </div>
+  </div>
+  <div id="0d496b18" class="margin">
+    <p>Once again, both solutions are entirely compatible and can even be
+      combined. It's at the programmer's discretion to opt for either
+      approach.</p>
+    <p>Now, the three columns that have already been incorporated into the
+      date can be eliminated:</p>
+  </div>
+  <div id="2477b277" class="margin">
+    <div class="sourceCode" id="cb20">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.delete(weather, [<span class="st">&#39;year&#39;</span>, <span class="st">&#39;month&#39;</span>, <span class="st">&#39;day&#39;</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="5935123c" class="margin">
+    <p>The current state of the weather table is as follows:</p>
+  </div>
+  <div id="797881f3" class="margin">
+    <div class="sourceCode" id="cb21">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>weather[:<span class="dv">3</span>].pd()</span></code></pre>
+    </div>
+  </div>
+  <div id="cc56cf70" class="margin">
+    <p>Now, let's shift our focus towards deconstructing the H* and V*
+      queries into multiple rows, while simultaneously introducing a time
+      column to prevent information gaps. In q, the conventional approach
+      would involve leveraging functional qSQL to extract columns conforming
+      to the aforementioned patterns. However, we will capitalize on the
+      advantage that PyKX offers by incorporating q code via strings to
+      sidestep this method:</p>
+  </div>
+  <div id="728e319c" class="margin">
+    <div class="sourceCode" id="cb22">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> functionalSearch(cols, pattern, func):</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    xcols <span class="op">=</span> cols[kx.q.where(kx.q.like(cols, pattern))]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    xstring <span class="op">=</span> func.<span class="bu">format</span>(kx.q.sv(<span class="st">b&quot;;&quot;</span>, kx.q.string(xcols)).py().decode(<span class="st">&quot;utf-8&quot;</span>))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> xcols, xstring</span></code></pre>
+    </div>
+  </div>
+  <div id="2a828db0" class="margin">
+    <p>The function above accepts a list of columns, a designated pattern
+      for searching, and a q function represented as a string. This function
+      takes the columns found following the specified pattern in qSQL format
+      (where columns are accessed by their names, not symbols) as an argument.
+      When applied to all columns commencing with "H," it yields these columns
+      as a vector of symbols, alongside a string representation of these
+      columns in qSQL format:</p>
+  </div>
+  <div id="6091fa6a" class="margin">
+    <div class="sourceCode" id="cb23">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> kx.q.cols(weather)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>found_columns, qsql_function <span class="op">=</span> functionalSearch(cols, <span class="st">b&#39;H*&#39;</span>, <span class="st">&quot;</span><span class="sc">{}</span><span class="st">&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Columns found: &quot;</span>, found_columns)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;qSQL function: &quot;</span>, qsql_function)</span></code></pre>
+    </div>
+  </div>
+  <div id="91873db7" class="margin">
+    <p>This capability is remarkably powerful, as it enables the utilization
+      of qSQL alongside variables, obviating the need for functional forms
+      which can often prove intricate for individuals new to kdb+/q
+      development.</p>
+    <p>Now, let's apply the above methodology to the columns commencing with
+      <strong>H</strong>, which correspond to the measurement values, and to
+      the columns commencing with <strong>V</strong>, which indicate the
+      validity of the measurements. The function employed to transform the
+      measurement column into rows is <code>flip</code>:
+    </p>
+  </div>
+  <div id="cbca5b61" class="margin">
+    <div class="sourceCode" id="cb24">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>hcols, value <span class="op">=</span> functionalSearch(cols, <span class="st">b&#39;H*&#39;</span>, <span class="st">&quot;flip(</span><span class="sc">{}</span><span class="st">)&quot;</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>vcols, valid <span class="op">=</span> functionalSearch(cols, <span class="st">b&#39;V*&#39;</span>, <span class="st">&quot;flip(</span><span class="sc">{}</span><span class="st">)&quot;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="b98f8279" class="margin">
+    <p>Our next step involves feeding our internally constructed functions,
+      represented as strings, into the qSQL <code>update</code> function. This
+      is done in conjunction with the repetition of the 24-hour sequence to
+      match the initial number of rows:</p>
+  </div>
+  <div id="c40e5441" class="margin">
+    <div class="sourceCode" id="cb25">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.update(weather, columns <span class="op">=</span> {<span class="st">&#39;hour&#39;</span>: <span class="st">&#39;count[i]#enlist 01:00*til 24&#39;</span>, <span class="st">&#39;values&#39;</span>: value, <span class="st">&#39;valid&#39;</span>: valid})</span></code></pre>
+    </div>
+  </div>
+  <div id="12f082f3" class="margin">
+    <p>To remove columns beginning with <strong>H</strong> or
+      <strong>V</strong>, we can employ the same approach as earlier to
+      circumvent the need for functional qSQL:
+    </p>
+  </div>
+  <div id="712df953" class="margin">
+    <div class="sourceCode" id="cb26">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.delete(weather, columns <span class="op">=</span> kx.q.raze(hcols,vcols).py())</span></code></pre>
+    </div>
+  </div>
+  <div id="5bb289e7" class="margin">
+    <p>Let's see the result:</p>
+  </div>
+  <div id="9533cadd" class="margin">
+    <div class="sourceCode" id="cb27">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>weather[:<span class="dv">3</span>].pd()</span></code></pre>
+    </div>
+  </div>
+  <div id="6106b1c9" class="margin">
+    <p>Finally, the remaining task involves expanding the table so that each
+      element within the lists corresponds to a distinct row:</p>
+  </div>
+  <div id="a185e603" class="margin">
+    <div class="sourceCode" id="cb28">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.ungroup(weather)</span></code></pre>
+    </div>
+  </div>
+  <div id="a8c59bd1" class="margin">
+    <p>We can further streamline the table by eliminating rows that lack
+      validity and merging the date with the time:</p>
+  </div>
+  <div id="6f8524a6" class="margin">
+    <div class="sourceCode" id="cb29">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.select(weather, where <span class="op">=</span> <span class="st">&#39;valid=`V&#39;</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.update(weather, columns <span class="op">=</span> {<span class="st">&#39;date&#39;</span>: <span class="st">&#39;date+hour&#39;</span>})</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q.qsql.delete(weather, columns <span class="op">=</span> [<span class="st">&quot;valid&quot;</span>, <span class="st">&quot;hour&quot;</span>])</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>weather[:<span class="dv">3</span>].pd()</span></code></pre>
+    </div>
+  </div>
+  <div id="fad6c8fa" class="margin">
+    <p>The <strong>magnitude</strong> column plays a pivotal role in
+      attributing meaning to the <strong>value</strong>. As outlined by the
+      dataset creators, the diverse magnitudes align with the elements
+      encapsulated within the following dictionary:</p>
+  </div>
+  <div id="82b864cd" class="margin">
+    <div class="sourceCode" id="cb30">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>magnitude <span class="op">=</span> {<span class="dv">80</span>:<span class="st">&quot;ultraviolet&quot;</span>, </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>             <span class="dv">81</span>:<span class="st">&quot;wind&quot;</span>, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>             <span class="dv">82</span>:<span class="st">&quot;direction&quot;</span>, </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>             <span class="dv">83</span>:<span class="st">&quot;temperature&quot;</span>, </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>             <span class="dv">86</span>:<span class="st">&quot;humidity&quot;</span>, </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>             <span class="dv">87</span>:<span class="st">&quot;pressure&quot;</span>, </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>             <span class="dv">88</span>:<span class="st">&quot;solar&quot;</span>, </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>             <span class="dv">89</span>:<span class="st">&quot;rainfall&quot;</span>}</span></code></pre>
+    </div>
+  </div>
+  <div id="ab5dcabf" class="margin">
+    <p>We just have to change the key by the value of the dictionary.</p>
+  </div>
+  <div id="a13b5d47" class="margin">
+    <div class="sourceCode" id="cb31">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q(<span class="st">&#39;{update magnitude: x magnitude from y}&#39;</span>, magnitude, weather)</span></code></pre>
+    </div>
+  </div>
+  <div id="5c6a2bcd" class="margin">
+    <p>Finally, all we have to do is separate the different weather
+      conditions into different columns:</p>
+  </div>
+  <div id="4bf369e1" class="margin">
+    <div class="sourceCode" id="cb32">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>weather <span class="op">=</span> kx.q(<span class="st">&#39;{exec (value x)#magnitude!values by date,weather_station from y}&#39;</span>,magnitude,weather)</span></code></pre>
+    </div>
+  </div>
+  <div id="b0fbd539" class="margin">
+    <p>The <code>exec</code> query provides us with the capability to
+      transform a dictionary, stored within a column, into multiple columns.
+      In this transformation, the keys become the column names, and the values
+      constitute the data within those respective columns. This proves
+      particularly beneficial when dealing with a dictionary that represents
+      the weather conditions of each entry, linked with their respective
+      values. By implementing this approach and subsequently grouping the
+      data, we effectively disseminate the weather conditions across distinct
+      columns for each weather entry and weather station.</p>
+  </div>
+  <div id="0843ec62" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
+      <div class="alert-header custom-card-header"
+        style="background-color: #fad5ff; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
+        Weather Cleaning
+      </div>
+      <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          This turned out to be a complex migration, since on Pandas this "flipping" functionality is provided by
+          <code>melt</code>: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> weather_hour = weather.melt(id_vars=["weather_station", "magnitud", "date"],
+                            value_vars=[x for x in weather.columns if re.match("^H", x)],
+                            var_name="hour")
+ >>>  
+ >>> weather_valid = weather.melt(value_vars=[x for x in weather.columns if re.match("^V", x)], var_name="valid")
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          As for the subsequent operations, those turned more alike to the original Pandas implementation: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> weather= weather_hour[weather_valid["value"] == "V"].reset_index()
+ >>> 
+ >>> weather["hour"] = weather["hour"].str[1:]
+ >>> weather["hour"] = pd.to_timedelta(weather['hour'].astype(int)-1, unit='h')
+ >>> weather["date"] = weather["date"] + weather["hour"]
+ >>> 
+ >>> weather_values = weather.assign(MAGNITUD = weather["magnitud"].map({80:"ultraviolet",
+                         81:"wind",
+                         82:"direction",
+                         83:"temperature",
+                         86:"humidity",
+                         87:"pressure",
+                         88:"solar",
+                         89:"rainfall"})) \
+                         .MAGNITUD.str.get_dummies() \
+                         .multiply(weather["value"], axis="index") 
+ >>> 
+ >>> weather = pd.concat([weather, weather_values], axis=1)
+ >>> weather = weather.drop(["index", "hour", "magnitud", "value"], axis=1)
+ >>> weather = weather.groupby(["date", "weather_station"]).sum().reset_index()
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          All in all, this table proved to be quite tricky with the migration, but nothing unmanageable. The rest of the
+          migration was far simpler. Overall, we noticed again a 10x decrease in execution time, which we consider
+          something remarkable. </p>
+        <table>
+          <tr style="background-color: #FFFFFF;">
+            <th style="background-color: #fbf1ff;"></th>
+            <th style="background-color:#fbf1ff">Pandas Time</th>
+            <th style="background-color:#fbf1ff">PyKX Time</th>
+          </tr>
+          <tr style="background-color:#fbf1ff; border-top: 1px solid #000000">
+            <td>Cleaning Weather</td>
+            <td>247 ms ± 10.4 ms</td>
+            <td>26.7 ms ± 683 µs</td>
+          </tr>
+        </table><br>
+      </div>
+    </div>
+  </div>
+  <div id="eb89abd3" class="margin">
+    <h4 id="location">Location</h4>
+  </div>
+  <div id="677a023c" class="margin">
+    <p>Both traffic and weather station tables will be loaded into the q
+      memory space:</p>
+  </div>
+  <div id="d2445911" class="margin">
+    <div class="sourceCode" id="cb33">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>kx.q[<span class="st">&quot;weather_station&quot;</span>] <span class="op">=</span> kx.q(<span class="st">&quot;.Q.id&quot;</span>, kx.q.read.csv(<span class="st">&#39;../Estaciones_control_datos_meteorologicos.csv&#39;</span>, types<span class="op">=</span><span class="st">&quot; IFF&quot;</span>, delimiter<span class="op">=</span><span class="st">&quot;;&quot;</span>, as_table<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>kx.q[<span class="st">&quot;traffic_station&quot;</span>] <span class="op">=</span> kx.q.read.csv(<span class="st">&#39;../pmed_ubicacion_12-2022.csv&#39;</span>, types <span class="op">=</span> <span class="st">&quot;SII**FFFF&quot;</span>, delimiter <span class="op">=</span> <span class="st">&quot;;&quot;</span>, as_table<span class="op">=</span><span class="va">True</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="33b3c09d" class="margin">
+    <p>We are now able to access these objects within q functions without
+      the necessity of passing them as PyKX or Python objects. To illustrate,
+      let's proceed to modify the column names in both tables in order to
+      establish a uniform naming convention:</p>
+  </div>
+  <div id="6c5a3528" class="margin">
+    <div class="sourceCode" id="cb34">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>kx.q(<span class="st">&quot;weather_station:(`CDIGO_CORTO`LONGITUD`LATITUD!`weather_station`longitude`latitude) xcol weather_station&quot;</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>_<span class="op">=</span>kx.q(<span class="st">&quot;traffic_station:(`id`longitud`latitud!`traffic_station`longitude`latitude) xcol traffic_station&quot;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="0cbf1e72" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on Using <a
+          href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/creating.html#by-retrieving-a-named-entity-from-qs-memory">Q
+          memory space</a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px; ">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          If you feel more comfortable programming in q, you have the option to operate within the q memory space. PyKX
+          objects can be seamlessly transferred into the q memory space, where you can manipulate them as if you were
+          operating within a q ecosystem, employing the following code: <code>kx.q["table"]</code>. Once you've
+          completed your operations, you can effortlessly bring them back to the Python memory space by returning them
+          using q code: <code>kx.q("table")</code></p>
+      </div>
+    </div>
+  </div>
+  <div id="d9cb6e86" class="margin">
+    <p>Our objective is to merge these two tables. Currently, there appears
+      to be no identifier that readily facilitates a conventional join.
+      Nevertheless, it's worth noting that both the weather and traffic
+      stations are situated by coordinates. We can exploit the spatial
+      proximity between stations designated for measuring traffic and weather
+      to facilitate the join. To compute the distance between two sets of
+      coordinates, the <a href="https://en.wikipedia.org/wiki/Haversine_formula">Harvesine
+        distance</a> as previously discussed, can be employed. It's important to
+      acknowledge that while this distance function is readily available in
+      Python, it is not natively accessible within q.</p>
+  </div>
+  <div id="0a71c287" class="margin" data-scrolled="true">
+    <div class="sourceCode" id="cb35">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pip install haversine</span></code></pre>
+    </div>
+  </div>
+  <div id="2070e874" class="margin">
+    <p>One potential approach would involve re-implementing the Haversine
+      distance function in q. However, this might become impractical for more
+      complex libraries. Alternatively, although slower, we could transmit our
+      q objects to Python and work with them there. Nonetheless, it's strongly
+      recommended to avoid switching objects between q and Python. However,
+      the data we had to move between memory spaces wasn't very large (and we
+      were careful about this) and we didn't see any noticeable drop in
+      performance.</p>
+    <p>The features we've elucidated earlier, allowing us to transition
+      between Python and q objects, empower us to temporarily reuse Python
+      code. This is particularly pertinent given the scale of tables we are
+      currently dealing with. To incorporate our q objects into this function,
+      we can leverage certain PyKX tools to convert them into Python
+      objects:</p>
+  </div>
+  <div id="05afc748" class="margin">
+    <div class="sourceCode" id="cb36">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> haversine <span class="im">import</span> haversine_vector, Unit</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>dist <span class="op">=</span> kx.toq(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>            haversine_vector(kx.q(<span class="st">&#39;`longitude`latitude # weather_station&#39;</span>).pd(), </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                             kx.q(<span class="st">&#39;`longitude`latitude # traffic_station&#39;</span>).pd(),</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                             Unit.KILOMETERS, comb<span class="op">=</span><span class="va">True</span>))</span></code></pre>
+    </div>
+  </div>
+  <div id="d9877b87" class="margin">
+    <p>We've reached a point where we have a matrix detailing the distance
+      in kilometers for every combination of traffic and weather stations. Our
+      upcoming task is to pinpoint pairs of station identifiers that exhibit
+      the minimum distance:</p>
+  </div>
+  <div id="0c51ae77" class="margin">
+    <div class="sourceCode" id="cb37">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>ids <span class="op">=</span> kx.q.each(kx.q(<span class="st">&#39;{first where x=min x}&#39;</span>), dist)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>distance_table <span class="op">=</span> kx.q(<span class="st">&#39;{traffic_station ^ weather_station[x]}&#39;</span> ,  ids)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>distance_table <span class="op">=</span> kx.q.qsql.delete(distance_table, columns <span class="op">=</span> [<span class="st">&#39;tipo_elem&#39;</span>,<span class="st">&#39;distrito&#39;</span>,<span class="st">&#39;cod_cent&#39;</span>,<span class="st">&#39;nombre&#39;</span>,<span class="st">&#39;utm_x&#39;</span>,<span class="st">&#39;utm_y&#39;</span>,<span class="st">&#39;longitude&#39;</span>, <span class="st">&#39;latitude&#39;</span>])</span></code></pre>
+    </div>
+  </div>
+  <div id="6c6e5673" class="margin">
+    <p>With this we have a mapping that relates every traffic station to its
+      nearest weather station:</p>
+  </div>
+  <div id="7203140e" class="margin">
+    <div class="sourceCode" id="cb38">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>distance_table[:<span class="dv">3</span>].pd()</span></code></pre>
+    </div>
+  </div>
+  <div id="c3c54e13" class="margin">
+    <h4 id="final-table">Final Table</h4>
+  </div>
+  <div id="950da21d" class="margin">
+    <p>Integrating the three tables is a relatively straightforward process.
+      The distances table can be seamlessly merged with either of the other
+      two using a simple left join. However, when joining the traffic and
+      weather tables, an asof join (<code>aj</code>) is necessary due to their
+      disparate time intervals. To conclude, two columns, time and day of the
+      week, should be appended to furnish the model with the data's inherent
+      seasonality:</p>
+  </div>
+  <div id="05a17234" class="margin">
+    <div class="sourceCode" id="cb39">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>complete <span class="op">=</span> kx.q.lj(traffic, kx.q.xkey(<span class="st">&#39;traffic_station&#39;</span>, distance_table))</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>complete <span class="op">=</span> kx.q.aj(kx.toq([<span class="st">&#39;date&#39;</span>,<span class="st">&#39;weather_station&#39;</span>]), complete, weather)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>complete <span class="op">=</span> kx.q.qsql.update(kx.q(<span class="st">&quot;0^&quot;</span>,complete),  {<span class="st">&quot;hour&quot;</span>:<span class="st">&quot;`hh$date&quot;</span>, <span class="st">&quot;weekday&quot;</span>:<span class="st">&#39;(&quot;d&quot;$date)mod 7&#39;</span>})</span></code></pre>
+    </div>
+  </div>
+  <div id="3d1630b6" class="margin">
+    <p>Let's look at this last table:</p>
+  </div>
+  <div id="92446f46" class="margin">
+    <div class="sourceCode" id="cb40">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>kx.q(<span class="st">&quot;5#&quot;</span>,complete).pd()</span></code></pre>
+    </div>
+  </div>
+  <div id="2998c540" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
+      <div class="alert-header custom-card-header"
+        style="background-color: #fad5ff; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
+        Final table
+      </div>
+      <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          This is another bottleneck we encountered on our profiling. On Pandas, the code looked kind of similar, with a
+          simple join and an asof join: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> complete = traffic.merge(distance_table, on=["traffic_station"], how="inner")
+>>> complete = pd.merge_asof(complete.sort_values(["date"]), weather, on='date', by=["weather_station"])
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          However we once again noticed a 10x reduction in execution time: </p>
+        <table>
+          <tr style="background-color: #FFFFFF;">
+            <th style="background-color: #fbf1ff;"></th>
+            <th style="background-color:#fbf1ff">Pandas Time</th>
+            <th style="background-color:#fbf1ff">PyKX Time</th>
+          </tr>
+          <tr style="border-top: 1px solid #000000">
+            <td>Join Final Table</td>
+            <td>7.1 s ± 168 ms</td>
+            <td>686 ms ± 24.1 ms</td>
+          </tr>
+        </table><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          This improvement is most likely due to performance benefits when using kdb, as it's optimized for time series
+          data and the asof join, which is where most of this performance gain came from.</p>
+      </div>
+    </div>
+  </div>
+  <div id="beeeaf88" class="margin">
+    <h3 id="model-">Model <a class="anchor" id="t32"></a></h3>
+  </div>
+  <div id="b55416f8" class="margin">
+    <p>For the model's input, we chose to cherry-pick only the essential
+      columns. Moreover, we apply normalization to the rainfall column using a
+      straightforward MinMax scaler. This function can be included within the
+      q memory space, ready for use whenever necessary:</p>
+  </div>
+  <div id="5aa1100f" class="margin">
+    <div class="sourceCode" id="cb41">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>kx.q(<span class="st">&quot;minMaxScale:{[l] {(x-y)%(z-y)}[;min l;max l]l}&quot;</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                  </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>final <span class="op">=</span> kx.q.qsql.select(complete, columns <span class="op">=</span> {<span class="st">&quot;date&quot;</span>: <span class="st">&quot;date&quot;</span>,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;traffic_station&quot;</span>:<span class="st">&quot;traffic_station&quot;</span>,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;hour&quot;</span>:<span class="st">&quot;hour&quot;</span>, </span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;weekday&quot;</span>: <span class="st">&quot;weekday&quot;</span>, </span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;traffic_load&quot;</span>: <span class="st">&quot;traffic_load%100&quot;</span>,</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">&quot;rainfall&quot;</span>:<span class="st">&quot;minMaxScale rainfall&quot;</span>}</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>                                    )</span></code></pre>
+    </div>
+  </div>
+  <div id="7e591be5" class="margin">
+    <p>Throughout this transition from Pandas, the primary challenge emerged
+      while migrating the <code>time_window</code> function, given its
+      reliance on loops. Our approach involved first comprehending the input
+      data, defining the desired output, and then formulating an idiomatic q
+      implementation rather than a direct 1:1 migration. This method proved
+      more time-efficient.</p>
+    <p>In this scenario, our input consisted of a table, and our desired
+      output was a list of matrices for each station. To facilitate this
+      process, we devised multiple functions that proved invaluable:</p>
+  </div>
+  <div id="2896fa4f" class="margin">
+    <ul>
+      <li><strong>sliding window</strong>: given a matrix, x, divides it into
+        chunks of length y:</li>
+    </ul>
+  </div>
+  <div id="e6b89595" class="margin">
+    <div class="sourceCode" id="cb42">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>_<span class="op">=</span>kx.q(<span class="st">&quot;&quot;&quot;sw:{({y#z _x}[x;y;]&#39;)til count b:y _x}&quot;&quot;&quot;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="052906f8" class="margin">
+    <ul>
+      <li><strong>get target</strong>: For a given matrix, x, it takes the
+        target located in the column z and the first lines are eliminated to
+        match with the chunks length y:</li>
+    </ul>
+  </div>
+  <div id="c96ce3a1" class="margin">
+    <div class="sourceCode" id="cb43">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>_<span class="op">=</span>kx.q(<span class="st">&quot;&quot;&quot;gt:{y _(flip x)[z]}&quot;&quot;&quot;</span>) <span class="co"># gets target (in position z)</span></span></code></pre>
+    </div>
+  </div>
+  <div id="4ac8947b" class="margin">
+    <ul>
+      <li><strong>to Matrix</strong>: Transform the table x to a matrix:</li>
+    </ul>
+  </div>
+  <div id="fc8fb88f" class="margin">
+    <div class="sourceCode" id="cb44">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>_<span class="op">=</span>kx.q(<span class="st">&quot;&quot;&quot;toMatrix:{({[t;i]value t[i]}[x;]&#39;)til count x:flip x}&quot;&quot;&quot;</span>) <span class="co"># table to matrix</span></span></code></pre>
+    </div>
+  </div>
+  <div id="b6201cbf" class="margin">
+    <ul>
+      <li>
+        <p><strong>prepareData</strong>: This function is designed to create
+          the training and testing datasets. It begins by selecting the necessary
+          columns (<code>columns</code>) from the table, grouped by traffic
+          station. For each traffic station, it retains <code>ntest</code> rows
+          for testing purposes. The data is divided into chunks of length
+          <code>chunkLen</code>. Finally, the function constructs a list of
+          dictionaries for training data and training targets (the load column),
+          as well as test data and test targets.
+        </p>
+        <p>To start, regardless of whether we require the training or testing
+          output, we must retrieve either the last <code>ntest</code>* records or
+          up to the last <code>ntest</code> records. Given the necessity of
+          performing this operation for the designated columns, a functional
+          statement emerged as the most suitable approach.</p>
+        <p>Once we've molded the data to align with our requirements, the
+          subsequent step involves constructing the list of matrices. Achieving
+          this entails employing a sliding window approach. In order to return a
+          list of matrices, rather than a list of tables, we leveraged the
+          <code>toMatrix</code> function, which facilitates the transformation of
+          a table into a matrix. Additionally, we harnessed the <code>sw</code>
+          (sliding window) function to apply the sliding window concept to a
+          singular large matrix.
+        </p>
+        <p>In terms of the y data, we enlisted the <code>gt</code> (get target)
+          function. This function retrieves the target data (traffic load), with
+          the exclusion of the first <code>chunkLen+1</code> entries.</p>
+      </li>
+    </ul>
+  </div>
+  <div id="41197b18" class="margin">
+    <div class="sourceCode" id="cb45">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>_<span class="op">=</span>kx.q(<span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="st">        prepareData:{[data; ntest; chunkLen; columns; locTarget]  </span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="st">            train:(toMatrix&#39;)?[data;();`traffic_station;columns!({(y;(-;(count;x);z);x)}[;_;ntest]&#39;)columns]; </span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="st">            test:(toMatrix&#39;)?[data;();`traffic_station;columns!({(y;(-;(count;x);z);x)}[;#;ntest]&#39;)columns];                                                                               </span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="st">            (((sw[;chunkLen]&#39;)test;(gt[;chunkLen;locTarget]&#39;)test);((sw[;chunkLen]&#39;)train;(gt[;chunkLen;locTarget]&#39;)train))   </span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;&quot;&quot;</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="570c36b5" class="margin">
+    <p>Lets test this function in action with only one station:</p>
+  </div>
+  <div id="04456bab" class="margin">
+    <div class="sourceCode" id="cb46">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>station_id <span class="op">=</span> <span class="dv">4010</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>station <span class="op">=</span> kx.q.qsql.select(final, where<span class="op">=</span>[<span class="st">&quot;traffic_station=&quot;</span><span class="op">+</span><span class="bu">str</span>(station_id)])</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> kx.q(<span class="st">&quot;prepareData&quot;</span>, station, <span class="dv">500</span>, <span class="dv">5</span>, kx.SymbolVector([<span class="st">&#39;rainfall&#39;</span>, <span class="st">&#39;traffic_load&#39;</span>, <span class="st">&#39;hour&#39;</span>, <span class="st">&#39;weekday&#39;</span>]), <span class="dv">1</span>)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>X_train, y_train <span class="op">=</span> np.array(data[<span class="dv">0</span>][<span class="dv">0</span>][station_id].py()), np.array(data[<span class="dv">0</span>][<span class="dv">1</span>][station_id].py())</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>X_test, y_test <span class="op">=</span>  np.array(data[<span class="dv">1</span>][<span class="dv">0</span>][station_id].py()), np.array(data[<span class="dv">1</span>][<span class="dv">1</span>][station_id].py())</span></code></pre>
+    </div>
+  </div>
+  <div id="57a4e81b" class="margin">
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
+      <div class="alert-header custom-card-header"
+        style="background-color: #fad5ff; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
+        Model Ingestion
+      </div>
+      <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          This is the last bottleneck we ran into while doing our profiling. We used the Python Sklearn MinMax scaler
+          for this. </p> <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> from sklearn.preprocessing import MinMaxScaler
+ >>> final_table["load"]/=100
+ >>> final_table["rainfall"] = MinMaxScaler().fit_transform(final_table["rainfall"]) 
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          We also created a custom function to make those 5-step back chunks for a particular station: </p>
+        <code
+          style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black">
+ >>> <div style="color:#007979;display:inline;"># Table Index: Load -> 2, Rainfall -> 7, Hour -> 11, Weekday -> 12 </div>
+ >>> 
+ >>> <div style="color:#007979;display:inline;"># Assign to each traffic station an array with the target column and the training information</div>
+ >>> 
+ >>> train = final_table.groupby('traffic_station').apply(lambda x: np.array(x[:500])[:,[2,7,11,12]].astype(float))
+ >>> test  = final_table.groupby('traffic_station').apply(lambda x: np.array(x[500:])[:,[2,7,11,12]].astype(float))
+ >>> 
+ >>> <div style="color:#007979;display:inline;"># Crete 5 step back chunks </div>
+ >>> def time_window(traffic_station, dataset, look_back=5):
+ >>>         data_X,  data_y= [], []
+ >>>         station_data = dataset[traffic_station]
+ >>>         for i in range(len(station_data)-look_back-1):
+ >>>             data_X.append(station_data[i:(i+look_back)])
+ >>>             data_y.append(station_data[i+look_back+1, 2])
+ >>>         return np.array(data_X), np.array(data_y)
+ >>> 
+ >>> train_X, train_y = create_dataset(train)
+ >>> test_X, test_y = create_dataset(test)
+</code><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          In this final test, we once again notice a huge time improvement:</p>
+        <table>
+          <tr style="background-color: #FFFFFF;">
+            <th style="background-color: #fbf1ff;"></th>
+            <th style="background-color:#fbf1ff">Pandas Time</th>
+            <th style="background-color:#fbf1ff">PyKX Time</th>
+          </tr>
+          <tr style="border-top: 1px solid #000000">
+            <td>Model Ingestion Preprocess</td>
+            <td>3.2 s ± 54.2 ms</td>
+            <td>178 ms ± 8.01 ms</td>
+          </tr>
+        </table><br>
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
+          This improvement is most likely due to performance benefits when using kdb, as it's optimized for time series
+          data and the asof join, which is where most of this performance gain came from.</p>
+      </div>
+    </div>
+    <p>That wraps up our migration to PyKX. Next, we proceed to confirm that
+      the model is working as intended with the data we acquired through
+      PyKX.</p>
+  </div>
+  <div id="026e5435" class="margin">
+    <p>Firstly, we install Tensorflow:</p>
+  </div>
+  <div id="9a27de1d" class="margin">
+    <div class="sourceCode" id="cb47">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>pip install tensorflow</span></code></pre>
+    </div>
+  </div>
+  <div id="d2f380aa" class="margin">
+    <p>And now we create and train a simple LSTM model:</p>
+  </div>
+  <div id="efbe9b8c" class="margin">
+    <div class="sourceCode" id="cb48">
+      <pre
+        class="sourceCode python"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras.models <span class="im">import</span> Sequential</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras.layers <span class="im">import</span> Dense,LSTM </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Sequential()</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>model.add(LSTM(units <span class="op">=</span> <span class="dv">50</span>, return_sequences<span class="op">=</span><span class="va">False</span>, input_shape<span class="op">=</span>[<span class="va">None</span>,<span class="dv">4</span>]))</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>model.add(Dense(units <span class="op">=</span> <span class="dv">1</span>))</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">&#39;mae&#39;</span>, optimizer<span class="op">=</span><span class="st">&#39;adam&#39;</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit(train_X, train_y, test_X, test_y):</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model.fit(train_X, train_y, </span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>                    epochs<span class="op">=</span><span class="dv">50</span>, batch_size<span class="op">=</span><span class="dv">8</span>, </span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>                    validation_data<span class="op">=</span>(test_X, test_y), </span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>                    verbose<span class="op">=</span><span class="dv">0</span>, shuffle<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> predict(data):</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model.predict(data, verbose<span class="op">=</span><span class="dv">0</span>)</span></code></pre>
+    </div>
+  </div>
+  <div id="792f6f32" class="margin">
+    <p>Now we can observe the loss curves for both training and validation
+      over epochs.</p>
+  </div>
+  <div id="d90d7ee4" class="margin">
+    <div class="sourceCode" id="cb49">
+      <pre class="sourceCode python"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> fit(X_train,y_train,X_test,y_test)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>plt.plot(history.history[<span class="st">&#39;loss&#39;</span>], label<span class="op">=</span><span class="st">&#39;train&#39;</span>)</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>plt.plot(history.history[<span class="st">&#39;val_loss&#39;</span>], label<span class="op">=</span><span class="st">&#39;validation&#39;</span>)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Train and Validation Loss Curves&quot;</span>)</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Epochs&quot;</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;Loss&quot;</span>)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre>
+    </div>
+  </div>
+  <div id="4f7246e0" class="margin">
+    <p>And finally, we can see the performance of the model in the following
+      graph:</p>
+  </div>
+  <div id="eb419a32" class="margin">
+    <div class="sourceCode" id="cb50">
+      <pre class="sourceCode python"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>plt.plot(y_test, label<span class="op">=</span><span class="st">&#39;test real&#39;</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">200</span>,<span class="dv">495</span>), model.predict(X_test[<span class="dv">200</span>:], verbose<span class="op">=</span><span class="dv">0</span>).flatten(), label<span class="op">=</span><span class="st">&#39;test predict&#39;</span>)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Real test vs Predicted test&quot;</span>)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Time(15 min)&quot;</span>)</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;Load&quot;</span>)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">&quot;upper right&quot;</span>)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre>
+    </div>
+  </div>
+  <div id="d7dc5e20" class="margin">
+    <h3 id="performance-gains-">Performance gains
+      <a class="anchor" id="t33"></a>
+    </h3>
+  </div>
+  <div id="79299f2c" class="margin">
+    <p>As discussed earlier, all 4 bottlenecks were solved by migrating to
+      the kdb+/q environment taking advantage of PyKX. Overall, the final
+      picture looks like this:</p>
+    <table>
+      <thead>
+        <tr class="header">
+          <th>         </th>
+          <th>Pandas Time    </th>
+          <th>PyKX Time      </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>Cleaning Weather</td>
+          <td>247 ms ± 10.4 ms</td>
+          <td>26.7 ms ± 683 µs</td>
+        </tr>
+        <tr class="even">
+          <td>Cleaning Traffic</td>
+          <td>25.5 s ± 1.29 s  </td>
+          <td>1.65 s ± 248 ms  </td>
+        </tr>
+        <tr class="odd">
+          <td>Join Final Table</td>
+          <td>7.1 s ± 168 ms  </td>
+          <td>686 ms ± 24.1 ms</td>
+        </tr>
+        <tr class="even">
+          <td>Model Ingestion Preprocess</td>
+          <td>3.2 s ± 54.2 ms</td>
+          <td>178 ms ± 8.01 ms</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>So we got a 10x decrease across the board. We went from a total of 36
+      seconds spent on these bottlenecks down to just shy of 4 seconds, which
+      is really impressive on itself. If a migration like this one was on the
+      horizon, we would strongly suggest profiling the code to see where it
+      struggles the most and try to think of a way to migrate those parts
+      alone to PyKX. Then, as a second step, we recommend to port the rest of
+      the code to PyKX in order to circumvent the overhead that moving data
+      between memory spaces inherently adds to the process.</p>
+  </div>
+  <div id="b522a5be" class="margin">
+    <div class="alert">
+      <b> 🔍 You can find on Github the resulting <a
+          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">PyKX-enhanced
+          pythonic code</a>. </b> (TBD: fix url)
+    </div>
+  </div>
+  <div id="91f0090c" class="margin">
+    <h2 id="pykxq-migration-">pykx.q migration
+      <a class="anchor" id="t4"></a>
+    </h2>
+  </div>
+  <div id="5e81d5b6" class="margin">
+    <p>After gaining proficiency in the q language, the team progressively
+      shifted towards utilizing <code>kx.q()</code> extensively, drawn by its
+      brevity. Yet, this approach introduced a level of monotony due to the
+      requirement of employing strings. As a remedy, a decision was made to
+      transition into a q environment. However, as highlighted in the previous
+      chapter, certain Python code proved challenging to migrate to q.
+      Consequently, the team chose to remain within PyKX, this time operating
+      within a q environment.</p>
+    <p>pykx.q facilitates the execution of Python code within a q
+      environment, thereby presenting new avenues for addressing existing
+      codebases. This flexibility enables the incorporation and utilization of
+      Python libraries, both those installed on the system and those available
+      as .py files.</p>
+    <p>In our scenario, we harness both of these options. We emphasize the
+      potential provided by these opportunities to integrate Python code
+      within pykx.q, while also providing a link to the project's <a href="">q
+        script</a> for readers seeking further insights.</p>
+    <div class="alert">
+      <b> 🔍 You can find on Github the resulting <a
+          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">PyKX-enhanced
+          kdb+/q code</a>. (TBD: fix url)</b>
+    </div>
+    <p>Our initial step involves executing the <code>haversine_vector</code>
+      function for calculating coordinate distances. Given its unavailability
+      in q, we opted to employ pykx.q to seamlessly integrate this library
+      directly into our q code. This was achieved through the following
+      lines:</p>
+    <div class="sourceCode" id="cb51">
+      <pre
+        class="sourceCode q"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>.pykx.pyexec<span class="st">&quot;from haversine import haversine_vector, Unit&quot;</span>;</span></code></pre>
+    </div>
+    <div class="alert alert-block alert-success"
+      style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 5px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
+      <div class="alert-header custom-card-header"
+        style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px;">
+        <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information
+        on <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/running_under_q.html">Python and Q Context</a>
+      </div>
+      <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          In PyKX.q, the python and q contexts coexists too. The utilization of <code>.pykx.pyexec</code> permits the
+          execution of Python code within the q environment. When you're in the q context, you can work with python
+          objects using the resources provided by pykx.q.These incluede indexing, function declaration, and library
+          importation. However, consistent with the recommendation of the previous chapter, it's generally better to
+          stick with q objects for as long as you can.</p>
+
+        <p
+          style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
+          Objects from the Python memory can be retrieved using <code>pykx.get</code> and transmitted using
+          <code>pykx.set</code>. The Python data type to be employed in the transformation can be specified using
+          <code>.pykx.setdefault</code>.</p>
+      </div>
+    </div>
+    <p>This function expects two Pandas DataFrames as input, so we need to
+      change the default conversion type from Numpy to Pandas:</p>
+    <div class="sourceCode" id="cb52">
+      <pre
+        class="sourceCode q"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>.pykx.setdefault<span class="st">&quot;pd&quot;</span>;</span></code></pre>
+    </div>
+    <p>Having done this, we can "move" our input variables to the Python
+      memory space using <code>.pykx.set</code></p>
+    <div class="sourceCode" id="cb53">
+      <pre
+        class="sourceCode q"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>.pykx.set[<span class="st">`</span><span class="at">a;</span><span class="st">`</span>longitude<span class="st">`</span><span class="at">latitude#a];</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="at">.pykx.set[</span><span class="st">`</span>b;<span class="st">`</span><span class="at">longitude</span><span class="st">`</span>latitude<span class="co">#b];</span></span></code></pre>
+    </div>
+    <p>And finally execute our function:</p>
+    <div class="sourceCode" id="cb54">
+      <pre
+        class="sourceCode q"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>(.pykx.eval<span class="st">&quot;haversine_vector(a, b, Unit.KILOMETERS, comb=True)&quot;</span>)<span class="st">`</span></span></code></pre>
+    </div>
+    <p>Notice the backtick at the end, this is for converting back to a q
+      type.</p>
+    <p>The other way we can run Python code is to load a .py (renamed to .p)
+      file using <code>\l</code>. This could be done as follows:</p>
+    <div class="sourceCode" id="cb55">
+      <pre
+        class="sourceCode q"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>system<span class="st">&quot;l kerasmodel.p&quot;</span>;</span></code></pre>
+    </div>
+    <p>Here we have included the functions <code>fit</code> and
+      <code>predict</code> previously defined in last section. We can load
+      them and use them like this:
+    </p>
+    <div class="sourceCode" id="cb56">
+      <pre
+        class="sourceCode q"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>modelfit<span class="sc">:</span>.pykx.get<span class="st">`</span><span class="at">fit;</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="at">modelfit[train[0][3403];train[1][3403];test[0][3403];test[1][3403]];</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="at">modelpredict:.pykx.get</span><span class="st">`</span>predict;</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>res<span class="sc">:</span>modelpredict[train[<span class="dv">0</span>][<span class="dv">3403</span>]];</span></code></pre>
+    </div>
+    <p>In terms of performance, we noticed a slight decrease in execution
+      time comparing to using PyKX:</p>
+    <table>
+      <colgroup>
+        <col style="width: 35%" />
+        <col style="width: 21%" />
+        <col style="width: 21%" />
+        <col style="width: 21%" />
+      </colgroup>
+      <thead>
+        <tr class="header">
+          <th>         </th>
+          <th>Pandas Time    </th>
+          <th>PyKX Time      </th>
+          <th>q Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>Cleaning Weather</td>
+          <td>247 ms ± 10.4 ms</td>
+          <td>26.7 ms ± 683 µs</td>
+          <td>22.3 ms ± 224 µs</td>
+        </tr>
+        <tr class="even">
+          <td>Cleaning Traffic</td>
+          <td>25.5 s ± 1.29 s  </td>
+          <td>1.65 s ± 248 ms  </td>
+          <td>1.627 s ± 124 ms</td>
+        </tr>
+        <tr class="odd">
+          <td>Join Final Table</td>
+          <td>7.1 s ± 168 ms  </td>
+          <td>686 ms ± 24.1 ms</td>
+          <td>543 ms ± 10.1 ms</td>
+        </tr>
+        <tr class="even">
+          <td>Model Ingestion Preprocess</td>
+          <td>3.2 s ± 54.2 ms</td>
+          <td>178 ms ± 8.01 ms</td>
+          <td>153 ms ± 3.12 ms</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>These little timing shifts might happen because of changes in memory
+      or processor activity, but it's not really noticeable as far as we could
+      see.</p>
+  </div>
+  <div id="0a55ce42" class="margin">
+    <h2 id="final-thoughts">Final
+      thoughts<a class="anchor" id="t5"></a></h2>
+    <p>Overall this project turned out smoother than expected thanks to
+      PyKX. It allowed us to get a foothold on the kdb+/q ecosystem before
+      making the full transition to using q code, which on itself it's
+      impressive. We achieved our goals of reducing execution time, as we saw
+      throughout this post, and learned a lot about the kdb+/q ecosystem and
+      its technologies.</p>
+    <p>It wasn't all smooth and sail though. For instance, we hit a
+      foundamental obstacle in the Pandas API. In an ideal world, the
+      transition from Pandas to PyKX using this API would be as simple as
+      importing PyKX, enabling a flag and getting the input tables as PyKX
+      objects. However, since we relied on operations such as
+      <code>group_by</code> and <code>melt</code>, it ended up being
+      unfeasible since this operations were not yet implemented and we would
+      have to manually code them, which would take a long time on itself. We
+      should note, however, that this feature is still on beta, so we look
+      forward to future improvements in this regard since it would make
+      migrations like this one much simpler once it becomes a drop-in
+      replacement for Pandas calls.
+    </p>
+    <p>In summary, with the experience we gained we dare to recommend you
+      following these steps as a PyKX migration guide:</p>
+    <ol>
+      <li>Profile the original code to locate bottlenecks. This allows us to
+        put the focus on the heavier parts of our process.</li>
+      <li>Once located, migrate those parts alone to PyKX. You
+        <strong>will</strong> take a performance hit when moving data from
+        memory spaces, but it's important to know the potential gains that are
+        possible, so measure the migrated bottlenecks alone to see the
+        difference.
+      </li>
+      <li>If your tables are not that large, you may be able to get away with
+        it as-is, not needing to do a full migration. If that's the case then
+        great! You are done. However, if you notice that the performance hit
+        when moving data between memory spaces is actually hindering the
+        process, consider a full migration to PyKX.</li>
+      <li>If a full migration to PyKX is needed, then first take a look at the
+        Pandas API. By the time you read this, it may have already improved
+        compatibility and could be a drop-in replacement for Pandas. If it's not
+        the case you will need to familiarise yourself with PyKX and get your
+        hands dirty as we had to.</li>
+    </ol>
+    <p>We hope this post could serve as a guide of sorts for those that want
+      to familiarise themselves with PyKX and the kdb+/q ecosystem since it
+      brings a lot to the table. In the end we were able to achieve a full 1:1
+      migration to PyKX and even to q with pykx.q, which is impressive given
+      the differences between the languages and their philosophy all while
+      notably cutting execution time. Below you will find some additional
+      references to continue learning PyKX. Have fun with PyKX!</p>
+  </div>
+  <div id="4b5cbbd1" class="margin">
+    <h2 id="bibliography-">Bibliography <a class="anchor" id="t5"></a></h2>
+    <ul>
+      <li><em>Vidas M, Tubić V, Ivanović I, Subotić M. Sustainability (Basel)
+          2022; 14(9): e4985, <a href="http://dx.doi.org/10.3390/su14094985"
+            class="uri">http://dx.doi.org/10.3390/su14094985</a></em><br />
+      </li>
+      <li><em>Y. Yao et al., "Analyzing the Effects of Rainfall on Urban
+          Traffic-Congestion Bottlenecks," in IEEE Journal of Selected Topics in
+          Applied Earth Observations and Remote Sensing, vol. 13, pp. 504-512,
+          2020, <a href="http://dx.doi.org/10.1109/JSTARS.2020.2966591"
+            class="uri">http://dx.doi.org/10.1109/JSTARS.2020.2966591</a></em><br />
+      </li>
+      <li><em>Essien, A., Petrounias, I., Sampaio, P., &amp; Sampaio, S.
+          (2018). The Impact of Rainfall and Temperature on Peak and Off-Peak
+          Urban Traffic. In Database and Expert Systems Applications : 28th
+          International Conference, DEXA 2018, Regensburg, Germany. (pp. 399-407).
+          (Lecture Notes in Computer Science). Springer Nature. <a href="https://doi.org/10.1007/978-3-319-98812-2_36"
+            class="uri">https://doi.org/10.1007/978-3-319-98812-2_36</a></em><br />
+      </li>
+      <li><em>A. Morrison and N. Crone, Accelerating Python Workflows using
+          PyKX, June 2023, KX Developers blog, <a href="https://kx.com/blog/accelerating-python-workflows-using-pykx/"
+            class="uri">https://kx.com/blog/accelerating-python-workflows-using-pykx/</a></em></li>
+      <li><em>Reuben Taylor. An Introduction to PyKX <a href="https://kx.com/videos/an-introduction-to-pykx/"
+            class="uri">https://kx.com/videos/an-introduction-to-pykx/</a> June,
+          2023</em></li>
+      <li><em>Paul Walsh PyKX Boosts Trade Analytics <a
+            href="https://www.treliant.com/knowledge-center/pykx-boosts-trade-analytics/"
+            class="uri">https://www.treliant.com/knowledge-center/pykx-boosts-trade-analytics/</a>
+          June 26, 2023</em></li>
+    </ul>
+    <p>(TBD: new refs - need formatting .. )</p>
+  </div>
+</body>
+
+</html>

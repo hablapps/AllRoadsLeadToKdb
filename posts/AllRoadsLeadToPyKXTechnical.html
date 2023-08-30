@@ -4,11 +4,12 @@
 <head>
   <title>TrafficQProjectRecords</title>
   <style>
-    code{
+    code {
       font-family: monospace, monospace;
       font-size: 1em;
     }
-    code{
+
+    code {
       font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     }
 
@@ -23,7 +24,7 @@
     }
 
     pre code {
-      padding:0;
+      padding: 0;
       margin-bottom: 20px;
       font-size: inherit;
       color: inherit;
@@ -198,13 +199,15 @@
       border: 1px solid transparent;
       border-radius: 4px;
     }
-    
+
     div.margin {
       margin-bottom: 10px;
       margin-top: 10px;
     }
 
-    table {overflow: scroll;}
+    table {
+      overflow: scroll;
+    }
 
     /* Warning */
   </style>
@@ -217,7 +220,7 @@
     <h1 id="all-roads-lead-to-kdb-the-technical-counterpart">All Roads Lead
       to Kdb: the technical counterpart</h1>
     <p>This post serves as a follow-up to our prior article, <a
-        href="https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html">All
+        href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/main/posts/AllRoadsLeadToPyKX.md">All
         Roads Lead to Kdb</a>, where we introduced the utility of the PyKX
       library from the perspective of Emma Monad, the CTO of a large fictional
       company known as Mad Flow. In addition to this high-level perspective,
@@ -1246,7 +1249,7 @@
     <p>Let's get started!</p>
     <div class="alert">
       <b> 🔍 You can find on Github the <a
-          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">Original
+          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/main/src/pandas/Pandas_code.py">Original
           Python Project</a> that will be migrated into PyKX. </b>
     </div>
   </div>
@@ -1456,8 +1459,7 @@
   <div id="c155fa58" class="margin">
     <div class="alert alert-block"
       style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
-      <div class="alert-header custom-card-header"
-        style="background-color: #fad5ff; color: black; padding: 10px;">
+      <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px;">
         <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
         Traffic Cleaning
       </div>
@@ -1747,8 +1749,7 @@
   <div id="e851d1fa" class="margin">
     <div class="alert alert-block alert-success"
       style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
-      <div class="alert-header custom-card-header"
-        style="background-color: #fad5ff; color: black; padding: 10px;">
+      <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px;">
         <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
         Time Join
       </div>
@@ -1964,8 +1965,7 @@
   <div id="0843ec62" class="margin">
     <div class="alert alert-block alert-success"
       style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
-      <div class="alert-header custom-card-header"
-        style="background-color: #fad5ff; color: black; padding: 10px;">
+      <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px;">
         <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
         Weather Cleaning
       </div>
@@ -1973,7 +1973,8 @@
         <p
           style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;line-weight: 1.5">
           This turned out to be a complex migration, since on Pandas this "flipping" functionality is provided by
-          <code>melt</code>: </p>
+          <code>melt</code>:
+        </p>
         <code
           style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> weather_hour = weather.melt(id_vars=["weather_station", "magnitud", "date"],
                             value_vars=[x for x in weather.columns if re.match("^H", x)],
@@ -2174,8 +2175,7 @@
   <div id="2998c540" class="margin">
     <div class="alert alert-block alert-success"
       style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
-      <div class="alert-header custom-card-header"
-        style="background-color: #fad5ff; color: black; padding: 10px;">
+      <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px;">
         <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
         Final table
       </div>
@@ -2345,8 +2345,7 @@
   <div id="57a4e81b" class="margin">
     <div class="alert alert-block alert-success"
       style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
-      <div class="alert-header custom-card-header"
-        style="background-color: #fad5ff; color: black; padding: 10px;">
+      <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px;">
         <i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative:
         Model Ingestion
       </div>
@@ -2529,7 +2528,7 @@
   <div id="b522a5be" class="margin">
     <div class="alert">
       <b> 🔍 You can find on Github the resulting <a
-          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">PyKX-enhanced
+          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/main/src/pykx/PyKX_code.py">PyKX-enhanced
           pythonic code</a>. </b> (TBD: fix url)
     </div>
   </div>
@@ -2558,7 +2557,7 @@
         script</a> for readers seeking further insights.</p>
     <div class="alert">
       <b> 🔍 You can find on Github the resulting <a
-          href="https://github.com/hablapps/AllRoadsLeadToPyKX/blob/Python-Version-Pre/AllRoadsLeadToPyKX.md">PyKX-enhanced
+          href="https://github.com/hablapps/AllRoadsLeadToPyKX/tree/main/src/pykx.q">PyKX-enhanced
           kdb+/q code</a>. (TBD: fix url)</b>
     </div>
     <p>Our initial step involves executing the <code>haversine_vector</code>
@@ -2590,7 +2589,8 @@
           style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px; line-weight: 1.5">
           Objects from the Python memory can be retrieved using <code>pykx.get</code> and transmitted using
           <code>pykx.set</code>. The Python data type to be employed in the transformation can be specified using
-          <code>.pykx.setdefault</code>.</p>
+          <code>.pykx.setdefault</code>.
+        </p>
       </div>
     </div>
     <p>This function expects two Pandas DataFrames as input, so we need to

@@ -10,11 +10,11 @@ This repository contains the source code for the posts on PyKX published on Habl
 
 * `posts/AllRoadsLeadToPyKX.md`.  Markdown source of Emma Monad's blog post. 
 
-* `posts/AllRoadsLeadToPyKX-Technical.ipynb`. Literate Python/PyKX code for the technical blog post.
+* `posts/AllRoadsLeadToPyKXTechnical.ipynb`. Literate Python/PyKX code for the technical blog post.
 
-* `src/pandas`, `src/pykx`, `src/pykx.q`. The three versions of the implementation of the Mad Flow use case: the original and inefficient Pandas version; its migration into PyKX/Python; and its migration into PyKX/Q.
+* `src/pandas`, `src/pykx`, `src/pykx.q`. The three versions of the implementation of the Mad Flow use case: the original and inefficient Pandas version; its migration into PyKX/Python; and its migration into PyKX/q.
 
 ## Running code
 
 * To execute the Python code, you need [PyKX 1.6](https://code.kx.com/pykx/1.6/getting-started/installing.html) installed. Additionally, for running the q code, you'll need [pykx.q](https://code.kx.com/pykx/1.6/api/pykx_under_q.html) as well as [q](https://code.kx.com/q/learn/install/) installed.
-- To obtain the source data files in CSV format, which are essential for running the notebook and the Python/Q files, please follow the instructions provided in the technical post. Ensure to place these files in the `./data` directory.
+- To obtain the source data files in CSV format, which are essential for running the notebook and the Python/q files, please follow the instructions provided in the technical post. Ensure to place these files in the `./data` directory.

@@ -241,11 +241,11 @@ final["rainfall"] = scaler.fit_transform(final[["rainfall"]].fillna(0))
 final = final.set_index(['date'])
 
 # the first data for train and then from 80 for test
-# 5: Rainfall, 12: Load, 13: Hour, 14: Weekday
+# 1: Load, 6: Rainfall,  10: Hour, 11: Weekday
 train = final.groupby('traffic_station').apply(lambda x: np.array(x[:-500])[:,[1,6,10,11]].astype(float))
 test  = final.groupby('traffic_station').apply(lambda x: np.array(x[-500:])[:,[1,6,10,11]].astype(float))
 
-# Separar en Windows, Entrada: La estacion, el dataset y los pasos hacia atras.
+# Separate in Windows, Input: The station, the dataset and the steps back.
 # The output: Matrix with shape: The measurements that have been made on the dataset - the steps back,
                             #  los pasos hacia atras,
                             #  the parameters.

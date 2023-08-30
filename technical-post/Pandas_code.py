@@ -226,15 +226,12 @@ from keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Filter:
-
-final = complete[(complete["weekday"]<5) & (complete["hour"]>9) & (complete["hour"]<20)].reset_index()
-final = final[final.groupby('traffic_station')['load'].transform('mean') >= 40]
+final = complete.copy()
 
 # Modify. 
 final["load"]/=100
 scaler = MinMaxScaler()
-final[["rainfall", "temperature"]] = scaler.fit_transform(final.iloc[:, [5,7]])
+final["rainfall"] = scaler.fit_transform(final[["rainfall"]].fillna(0))
 
 # Create input:
     # traffic_station 0: [data_t0, data_t1, data_t2, data_t3, ...]
@@ -245,8 +242,8 @@ final = final.set_index(['date'])
 
 # the first data for train and then from 80 for test
 # 5: Rainfall, 12: Load, 13: Hour, 14: Weekday
-train = final.groupby('traffic_station').apply(lambda x: np.array(x[:-80])[:,[2, 7,11,12]].astype(float))
-test  = final.groupby('traffic_station').apply(lambda x: np.array(x[-80:])[:,[2, 7,11,12]].astype(float))
+train = final.groupby('traffic_station').apply(lambda x: np.array(x[:-500])[:,[1,6,10,11]].astype(float))
+test  = final.groupby('traffic_station').apply(lambda x: np.array(x[-500:])[:,[1,6,10,11]].astype(float))
 
 # Separar en Windows, Entrada: La estacion, el dataset y los pasos hacia atras.
 # The output: Matrix with shape: The measurements that have been made on the dataset - the steps back,
@@ -278,13 +275,13 @@ get_ipython().run_cell_magic('timeit', '-n 2 -r 5', 'from sklearn.preprocessing 
 # design network
 model = Sequential()
 
-model.add(LSTM(units = 50, return_sequences=True, input_shape=[None,5]))
+model.add(LSTM(units = 50, return_sequences=True, input_shape=[None,4]))
 model.add(Dense(units = 1))
 
 model.compile(loss='mae', optimizer='adam')
 
 # fit network
-history = model.fit(train_X, train_y, epochs=3, batch_size=64, validation_data=(test_X, test_y), verbose=1, shuffle=False)
+history = model.fit(train_X, train_y, epochs=10, batch_size=64, validation_data=(test_X, test_y), verbose=1, shuffle=False)
 
 # plot history
 plt.plot(history.history['loss'], label='train')

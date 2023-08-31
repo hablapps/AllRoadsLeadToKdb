@@ -18416,8 +18416,7 @@ class="
     <b> 🔍 You can find on Github the resulting <a href="https://github.com/hablapps/AllRoadsLeadToKdb/tree/main/src/pykx.q">PyKX-enhanced kdb+/q code</a>.</b>
 </div><p>Our initial step involves executing the <code>haversine_vector</code> function for calculating coordinate distances. Given its unavailability in q, we opted to employ pykx.q to seamlessly integrate this library directly into our q code. This was achieved through the following lines:</p>
 
-<pre><code>q
-.pykx.pyexec"from haversine import haversine_vector, Unit";</code></pre>
+<pre><code>.pykx.pyexec"from haversine import haversine_vector, Unit";</code></pre>
 <div class="alert alert-block alert-success" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 5px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
 <div class="alert-header custom-card-header" style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px; font-size: 115%;">
 <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information on <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/running_under_q.html">Python and Q Context</a> 
@@ -18429,26 +18428,21 @@ class="
 </div>
 </div><p>This function expects two Pandas DataFrames as input, so we need to change the default conversion type from Numpy to Pandas:</p>
 
-<pre><code>q
-.pykx.setdefault"pd";</code></pre>
+<pre><code>.pykx.setdefault"pd";</code></pre>
 <p>Having done this, we can "move" our input variables to the Python memory space using <code>.pykx.set</code></p>
 
-<pre><code>q
-.pykx.set[`a;`longitude`latitude#a];
+<pre><code>.pykx.set[`a;`longitude`latitude#a];
 .pykx.set[`b;`longitude`latitude#b];</code></pre>
 <p>And finally execute our function:</p>
 
-<pre><code>q
-(.pykx.eval"haversine_vector(a, b, Unit.KILOMETERS, comb=True)")`</code></pre>
+<pre><code>(.pykx.eval"haversine_vector(a, b, Unit.KILOMETERS, comb=True)")`</code></pre>
 <p>Notice the backtick at the end, this is for converting back to a q type.</p>
 <p>The other way we can run Python code is to load a .py (renamed to .p) file using <code>\l</code>. This could be done as follows:</p>
 
-<pre><code>q
-system"l kerasmodel.p";</code></pre>
+<pre><code>system"l kerasmodel.p";</code></pre>
 <p>Here we have included the functions <code>fit</code> and <code>predict</code> previously defined in last section. We can load them and use them like this:</p>
 
-<pre><code>q
-modelfit:.pykx.get`fit;
+<pre><code>modelfit:.pykx.get`fit;
 modelfit[train[0][3403];train[1][3403];test[0][3403];test[1][3403]];
 modelpredict:.pykx.get`predict;
 res:modelpredict[train[0][3403]];</code></pre>

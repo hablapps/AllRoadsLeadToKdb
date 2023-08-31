@@ -2,9 +2,8 @@
 
 This repository contains the source code for the posts on PyKX published on Habla Computings's blog: 
 
-* [All Roads Lead to Kdb](https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-kdb.html). An introduction to the PyKX library narrated by Emma Monad, a fictional character who plays the role of CTO at the equally fictional company Mad Flow.
-
-* [All Roads Lead to Kdb: the technical counterpart](https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-kdb.html). An in-depth technical description of the use case and PyKX code introduced in the last post. It's intended to serve as a PyKX migration guide for programmers. 
+* [All Roads Lead to Kdb](https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html). An introduction to the PyKX library narrated by Emma Monad, a fictional character who plays the role of CTO at the equally fictional company Mad Flow.
+* [All Roads Lead to Kdb: the technical counterpart](https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html). An in-depth technical description of the use case and PyKX code introduced in the last post. It's intended to serve as a PyKX migration guide for programmers. 
 
 ## Content
 

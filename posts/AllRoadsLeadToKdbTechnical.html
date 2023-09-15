@@ -14579,14 +14579,14 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="All-Roads-Lead-to-Kdb:-the-technical-counterpart">All Roads Lead to Kdb: the technical counterpart<a class="anchor-link" href="#All-Roads-Lead-to-Kdb:-the-technical-counterpart">&#182;</a></h1><p>This post serves as a follow-up to our prior article, <a href="https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html">All Roads Lead to Kdb</a>, where we introduced the utility of the PyKX library from the perspective of Emma Monad, the CTO of a large fictional company known as Mad Flow. In addition to this high-level perspective, the focus of this post is on Python programmers who are eager to explore the technical intricacies that were left unexplained in the aforementioned article. Consequently, the post will provide them with a highly detailed, step-by-step example of how to migrate an existing Python codebase into PyKX. Similarly to the outcomes presented in the post <a href="https://kx.com/blog/accelerating-python-workflows-using-pykx/">Accelerating Python Workflows using PyKX</a>, which we highly recommend reading, we will observe a significant performance advantage of the resulting PyKX code compared to the initial Pandas implementation. More references are available in the bibliography at the end of the post.</p>
+<h1 id="All-Roads-Lead-to-Kdb:-the-technical-counterpart">All Roads Lead to Kdb: the technical counterpart<a class="anchor-link" href="#All-Roads-Lead-to-Kdb:-the-technical-counterpart">&#182;</a></h1><p>This post serves as a follow-up to our prior article, <a href="https://www.habla.dev/blog/2023/07/31/all-roads-lead-to-pykx.html">All Roads Lead to Kdb</a>, where we introduced the utility of the PyKX library from the perspective of Emma Monad, the CTO of a large fictional company known as Mad Flow. In addition to this high-level perspective, the focus of this post is on Python programmers who are eager to explore the technical intricacies that were left unexplained in the aforementioned article. Consequently, the post will provide them with a highly detailed, step-by-step example of how to migrate an existing Python codebase into PyKX. Similarly to the outcomes presented in the post <a href="https://kx.com/blog/accelerating-python-workflows-using-pykx/">Accelerating Python Workflows using PyKX</a>, which we highly recommend reading, we will observe a significant performance advantage of the resulting PyKX code compared to the initial pandas implementation. More references are available in the bibliography at the end of the post.</p>
 <p>The structure of the post will be as follows:</p>
 <ul>
 <li><a href="#t2"><strong>The Use Case</strong></a>: We will begin by explaining the traffic improvement use case itself, encompassing its objectives, data sources, and anticipated outcomes. This section will also include references to the necessary data sources required to execute all the code provided in this post.</li>
 <li><a href="#t3"><strong>PyKX migration</strong></a>: Subsequently, we will illustrate the process of delegating resource-intensive tasks to kdb+/q using PyKX, all while staying within the Python environment. This kind of PyKX-boosted Pythonic version is probably the fastest way to begin harnessing the capabilities of the kdb+/q environment.</li>
 <li><a href="#t4"><strong>pykx.q migration</strong></a>: Lastly, we will delve into the process of transitioning the code to pure kdb+/q, while continuing to utilize PyKX to retain the Pythonic code you wish to preserve. This kdb+/q version enhanced by PyKX is presented for those interested in a more extensive adoption of kdb+/q.</li>
 </ul>
-<p>The initial section regarding the use case is independent of programming languages and is primarily included for reference purposes. If you're eager to delve directly into the code and begin learning how to migrate pure Pandas-based Python code into PyKX, you can proceed to the <a href="#t3">second section</a> now and revisit the <a href="#t2">first section</a> as necessary.</p>
+<p>The initial section regarding the use case is independent of programming languages and is primarily included for reference purposes. If you're eager to delve directly into the code and begin learning how to migrate pure pandas-based Python code into PyKX, you can proceed to the <a href="#t3">second section</a> now and revisit the <a href="#t2">first section</a> as necessary.</p>
 <h2 id="Use-Case">Use Case<a class="anchor" id="t2" /><a class="anchor-link" href="#Use-Case">&#182;</a></h2><p>With the aim of predicting traffic congestion in the presence of rain, Mad Flow dedicated significant effort to preparing and integrating weather and traffic data into an LSTM model. This endeavor aligned with other <a href="https://www.mdpi.com/1424-8220/20/13/3749">studies</a> that sought to forecast traffic patterns using LSTM models based on air pollution.  Just like findings from studies in cities such as <a href="https://pure.manchester.ac.uk/ws/portalfiles/portal/72721911/DEXA_Camera_8_pages.pdf">Manchester</a>, <a href="https://ieeexplore.ieee.org/document/8964560">Shenzhen</a> and <a href="https://www.safetylit.org/citations/index.php?fuseaction=citations.viewdetails&amp;citationIds[]=citjournalarticle_716898_14">Belgrade</a>, our results project a weekday traffic volume increase of 5-15% during peak hours in the presence of rain.</p>
 <p>Like in most projects related to smart cities, the used data is notable diverse, so it needed a lot of preparatory work. The following sections will detail the data sources, the cleansing and interpretation processes, as well as the used model.</p>
 <h3 id="Data-sources-">Data sources <a class="anchor" id="t21" /><a class="anchor-link" href="#Data-sources-">&#182;</a></h3><p>The <a href="https://datos.madrid.es/portal/site/egob">Madrid City Council</a> provides weather and traffic data, including both real-time and historical records. For the purpose of model training, only the historical data is pertinent. These datasets, formatted as CSV files, are categorized by months spanning from the year 2018 to the present.</p>
@@ -15244,7 +15244,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <table>
 <thead><tr>
 <th>         </th>
-<th>Pandas Time      </th>
+<th>pandas Time      </th>
 </tr>
 </thead>
 <tbody>
@@ -15268,7 +15268,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </table>
 <p>At this point, a fundamental decision had to be made regarding the migration strategy. Let's delve into the two alternatives at our disposal, along with their positive and negative aspects:</p>
 <ul>
-    <li> <p> <b> Partial Migration</b>:  This approach involves identifying the specific points where Pandas experiences the greatest strain. Subsequently, these segments can be migrated to q using PyKX, while leaving the rest of the code intact. This alternative capitalizes on the compatibility features of PyKX, which ensure a seamless interaction between pure Pandas/Numpy and PyKX. For instance, we may use the <code>.pd()</code> method, which allows us to convert a PyPX table object into a Pandas dataframe. This strategy can be particularly effective if the demarcation between computationally demanding and less complex segments is evident.  However, this isn't always the case, leading to multiple conversions between Python and q. Furthermore, as the <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/performance.html">documentation recommends</a>, we should minimize these Python-to-Q conversions whenever feasible. </p>  
+    <li> <p> <b> Partial Migration</b>:  This approach involves identifying the specific points where pandas experiences the greatest strain. Subsequently, these segments can be migrated to q using PyKX, while leaving the rest of the code intact. This alternative capitalizes on the compatibility features of PyKX, which ensure a seamless interaction between pure pandas/NumPy and PyKX. For instance, we may use the <code>.pd()</code> method, which allows us to convert a PyPX table object into a pandas dataframe. This strategy can be particularly effective if the demarcation between computationally demanding and less complex segments is evident.  However, this isn't always the case, leading to multiple conversions between Python and q. Furthermore, as the <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/performance.html">documentation recommends</a>, we should minimize these Python-to-Q conversions whenever feasible. </p>  
   <p>To test how much time is lost in these conversions, we moved the weather and traffic tables, as well as a 12-million-row table from a later stage in the process, to Python using the <code>.pd()</code> method. The outcomes displayed in the subsequent table led us to dismiss this option. </p>  
 <table>
     <tr style= "background-color: #FFFFFF">
@@ -15289,12 +15289,12 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
     </tr>
 </table>
 
-   <p>A promising alternative to this intermediate transformations method is the PyKX implementation of the <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html">Pandas API</a>. However, as we will explore later, even this had to be discarded for our particular case. </p>  </li>
+   <p>A promising alternative to this intermediate transformations method is the PyKX implementation of the <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/pandas_API.html">pandas API</a>. However, as we will explore later, even this had to be discarded for our particular case. </p>  </li>
    <br>
  <li>  <b> Complete Migration</b>: Completely migrating the code to PyKX allows for the full use of kdb+/q processing capabilities without the need to switch between memory spaces. This strategy is particularly pertinent for managing substantial volume of data. In our case, a complete migration to PyKX became indispensable. Although it might seem challenging at first, as we will soon realize, having a basic understanding of q will make this process straightforward. </li>
     </ul><p>Let's get started!</p>
 <div class="alert alert-block alert-info">
-    <b> 🔍 You can find on Github the <a href="https://github.com/hablapps/AllRoadsLeadToKdb/blob/main/src/pandas/Pandas_code.py">Original Python Project</a> that will be migrated into PyKX. </b>
+    <b> 🔍 You can find on Github the <a href="https://github.com/hablapps/AllRoadsLeadToKdb/blob/main/src/pandas/pandas_code.py">Original Python Project</a> that will be migrated into PyKX. </b>
 </div>
 </div>
 </div>
@@ -15375,7 +15375,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>An excellent starting point for the migration process involves transferring our data to q world. Once they are in the q environment we can even revert these objects to Pandas and leverage all our existing code. This approach ensures that our data remains stored within the kdb environment, thus benefitting from its rapid and scalable database capabilities. However, it's important to acknowledge that we might sacrifice the processing prowess of kdb+/q. As a result, we will proceed with deeper steps in the migration process.</p>
+<p>An excellent starting point for the migration process involves transferring our data to q world. Once they are in the q environment we can even revert these objects to pandas and leverage all our existing code. This approach ensures that our data remains stored within the kdb environment, thus benefitting from its rapid and scalable database capabilities. However, it's important to acknowledge that we might sacrifice the processing prowess of kdb+/q. As a result, we will proceed with deeper steps in the migration process.</p>
 <p>Before continuing, be sure to download the <a href="#t21">datasets</a> required for running the next pieces of code.</p>
 
 </div>
@@ -15399,7 +15399,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The preprocessing of the traffic table was one of the most critical parts in terms of time. Later on, we will showcase the improvement in execution time compared to our pure Pandas implementation.</p>
+<p>The preprocessing of the traffic table was one of the most critical parts in terms of time. Later on, we will showcase the improvement in execution time compared to our pure pandas implementation.</p>
 <p>The data loading will be executed employing the utilities facilitated by PyKX:</p>
 
 </div>
@@ -15622,7 +15622,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information on <a href="https://code.kx.com/pykx/1.6/user-guide/fundamentals/indexing.html">pythonic indexing in PyKX</a>
 </div>
 <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> Accessing data within PyKX objects, be it lists or tables, follows a methodology analogous to that of Numpy or Pandas. This facilitates the indexing of PyKX objects without necessitating the explicit utilization of q functions. Furthermore, the capacity to index by columns is an additional convenience offered by this approach.</p>        
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> Accessing data within PyKX objects, be it lists or tables, follows a methodology analogous to that of NumPy or pandas. This facilitates the indexing of PyKX objects without necessitating the explicit utilization of q functions. Furthermore, the capacity to index by columns is an additional convenience offered by this approach.</p>        
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> print(weather["H01"][:3]) 
 <div style="color:#808080;display:inline;"> 270 9 94.7 </div></code><br>   
 </div>
@@ -15776,10 +15776,10 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div class="alert alert-block" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
 <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px; font-size: 115%;">
-<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative: Traffic Cleaning
+<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;pandas Alternative: Traffic Cleaning
 </div>
 <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> Although it may look like a simple query, it is performing a seriously heavy operation. The original Pandas implementation looked like this: </p>        
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> Although it may look like a simple query, it is performing a seriously heavy operation. The original pandas implementation looked like this: </p>        
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> traffic = traffic[traffic["error"] == "N"].rename(columns={"carga":"load", "id":"traffic_station"})
  >>> traffic['date'] = pd.to_datetime(traffic['fecha'], errors='coerce')
  >>> traffic.drop(["tipo_elem", "error", "periodo_integracion", "fecha", "intensidad", "ocupacion", "vmed"], axis=1, inplace=True)
@@ -15789,7 +15789,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <table>
     <tr style="background-color: #FFFFFF;">
         <th style="background-color: #fbf1ff;" ></th>
-        <th style="background-color:#fbf1ff">Pandas Time</th>
+        <th style="background-color:#fbf1ff">pandas Time</th>
         <th style="background-color:#fbf1ff">PyKX Time</th>
     </tr>
     <tr style= "border-top: 1px solid #000000">
@@ -15868,10 +15868,10 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div class="alert alert-block alert-success" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #00b100;margin-left: 5%; margin-right: 5%; border-top: 3px solid #00b100">
 <div class="alert-header custom-card-header" style="background-color: #d8ffd8; border: 1px solid #d8ffd8; color: black; padding: 10px; font-size: 115%;">
-<i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information on Using <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/numpy.html">Numpy</a> and  <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/Pandas_API.html">Pandas</a>
+<i class="fa fa-commenting" aria-hidden="true" style="color:#00b100"></i>&nbsp;&nbsp;&nbsp;Further Information on Using <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/numpy.html">NumPy</a> and  <a href="https://code.kx.com/pykx/1.6/user-guide/advanced/pandas_API.html">pandas</a>
 </div>
 <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> For individuals who are still acclimatizing to the kdb+/q ecosystem, a partial adoption of Numpy's functionality remains accessible. Specifically   <a href="https://numpy.org/doc/stable/reference/ufuncs.html">universal functions</a>. By using this type of function, the average q function that was employed in the previous query can be rephrased as follows:</p> 
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> For individuals who are still acclimatizing to the kdb+/q ecosystem, a partial adoption of NumPy's functionality remains accessible. Specifically   <a href="https://numpy.org/doc/stable/reference/ufuncs.html">universal functions</a>. By using this type of function, the average q function that was employed in the previous query can be rephrased as follows:</p> 
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;color:black"> >>> import numpy as np
  >>>
  >>> def npmean(arr):
@@ -15880,7 +15880,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
  >>> print(npmean(traffic["load"]))    
 <div style="color:#808080;display:inline;">5.4 </div></code><br>
 <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5">
-    While the ability to reuse numpy functions inside q is really nice and can be of great help during a migration like the one we are exemplifying, we found that we were not able to use this numpy function on our <code>kx.q.qsql()</code> query. After executing the previous code, our query would look something like this:  
+    While the ability to reuse NumPy functions inside q is really nice and can be of great help during a migration like the one we are exemplifying, we found that we were not able to use this NumPy function on our <code>kx.q.qsql()</code> query. After executing the previous code, our query would look something like this:  
 </p>
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;color:black"> 
  >>> kx.q["npmean"] = npmean 
@@ -15890,11 +15890,11 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
                                 where = "error=`N")
 </code><br>
 <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5">
-    Notice the function called to perform the average of the <code>traffic_load</code> column is the one defined earlier. Even though we didn't get any errors, this resulted in our code running for over 20 minutes with no feedback until we eventually stopped it manually, so we can't recommend the usage Numpy functions inside a qSQL query like we did. We suspect it may have something to do with q's <code>avg</code> function (and all of q's functions) being optimised for this kind of usages and Numpy's implementation not being ready to deal with how kdb+/q implements its tables. It may also have something to do with the <code>group by</code> clause, which creates a keyed table on q, but we can't confirm it as of now.
+    Notice the function called to perform the average of the <code>traffic_load</code> column is the one defined earlier. Even though we didn't get any errors, this resulted in our code running for over 20 minutes with no feedback until we eventually stopped it manually, so we can't recommend the usage NumPy functions inside a qSQL query like we did. We suspect it may have something to do with q's <code>avg</code> function (and all of q's functions) being optimised for this kind of usages and NumPy's implementation not being ready to deal with how kdb+/q implements its tables. It may also have something to do with the <code>group by</code> clause, which creates a keyed table on q, but we can't confirm it as of now.
 </p>
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%; line-weight: 1.5"> On the other hand, Pandas can seamlessly interface with PyKX objects through the Pandas API. This can be effortlessly achieved by importing Numpy and Pandas and toggling a designated flag. We can try to replicate the previous select:</p>     
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%; line-weight: 1.5"> On the other hand, pandas can seamlessly interface with PyKX objects through the pandas API. This can be effortlessly achieved by importing NumPy and pandas and toggling a designated flag. We can try to replicate the previous select:</p>     
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;color:black"> >>> import os
- >>> os.environ['PYKX_ENABLE_PANDAS_API'] = 'true'
+ >>> os.environ['PYKX_ENABLE_pandas_API'] = 'true'
  >>> import numpy as np
  >>> import pandas as pd
  >>>
@@ -15908,7 +15908,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 2022.12.01D01:00:00.000000000 1001 0     
 </div></code>
 <br>
- <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%; line-weight: 1.5"> However, it's worth noting that the Pandas API is currently under development, hence not all of Pandas functions have been fully incorporated yet. And unfortunately, <code>groupby</code> is one of them. We hope that in the future we can migrate our Pandas code to PyKX without any changes.</p>
+ <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%; line-weight: 1.5"> However, it's worth noting that the pandas API is currently under development, hence not all of pandas functions have been fully incorporated yet. And unfortunately, <code>groupby</code> is one of them. We hope that in the future we can migrate our pandas code to PyKX without any changes.</p>
 </div>
 </div>
 </div>
@@ -15960,7 +15960,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>To display a table in markdown format, we can transfer it to Pandas:</p>
+<p>To display a table in markdown format, we can transfer it to pandas:</p>
 
 </div>
 </div>
@@ -16135,7 +16135,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div style="background-color: #e5ffdf70;  padding: 40px; padding-top:30px; padding-bottom:20px">
 <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%; line-weight: 1.5"> 
-Objects from q can be converted to Pandas with <code>.pd()</code>, to PyArrow with <code>.pa()</code>, to Numpy with <code>.np()</code> and to Python with <code>.py()</code> methods. This flexibility empowers Python developers, especially those new to PyKX, to seamlessly tap into the capabilities of kdb+ databases while acquainting themselves with q.
+Objects from q can be converted to pandas with <code>.pd()</code>, to PyArrow with <code>.pa()</code>, to NumPy with <code>.np()</code> and to Python with <code>.py()</code> methods. This flexibility empowers Python developers, especially those new to PyKX, to seamlessly tap into the capabilities of kdb+ databases while acquainting themselves with q.
 </p>
 </div>
 </div>
@@ -16478,10 +16478,10 @@ Objects from q can be converted to Pandas with <code>.pd()</code>, to PyArrow wi
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div class="alert alert-block alert-success" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
 <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px; font-size: 115%;">
-<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative: Time Join
+<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;pandas Alternative: Time Join
 </div>
 <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> In Pandas, we achieved this by executing this operation on our table: </p>        
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> In pandas, we achieved this by executing this operation on our table: </p>        
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> pd.to_datetime(weather[["year", "month", "day"]])
 </code><br>
      <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5">It seems to be less complicated thanks to having a function that does exactly what we need, whereas in q we had to implement this function ourselves.</p> 
@@ -17240,17 +17240,17 @@ qSQL function:  H01;H02;H03;H04;H05;H06;H07;H08;H09;H10;H11;H12;H13;H14;H15;H16;
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div class="alert alert-block alert-success" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
 <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px; font-size: 115%;">
-<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative: Weather Cleaning
+<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;pandas Alternative: Weather Cleaning
 </div>
 <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> This turned out to be a complex migration, since on Pandas this "flipping" functionality is provided by <code>melt</code>: </p>        
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> This turned out to be a complex migration, since on pandas this "flipping" functionality is provided by <code>melt</code>: </p>        
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> weather_hour = weather.melt(id_vars=["weather_station", "magnitud", "date"],
                             value_vars=[x for x in weather.columns if re.match("^H", x)],
                             var_name="hour")
  >>>  
  >>> weather_valid = weather.melt(value_vars=[x for x in weather.columns if re.match("^V", x)], var_name="valid")
 </code><br>
-    <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> As for the subsequent operations, those turned more alike to the original Pandas implementation: </p>   
+    <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> As for the subsequent operations, those turned more alike to the original pandas implementation: </p>   
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> weather= weather_hour[weather_valid["value"] == "V"].reset_index()
  >>> 
  >>> weather["hour"] = weather["hour"].str[1:]
@@ -17276,7 +17276,7 @@ qSQL function:  H01;H02;H03;H04;H05;H06;H07;H08;H09;H10;H11;H12;H13;H14;H15;H16;
     <table>
     <tr style="background-color: #FFFFFF;">
         <th style="background-color: #fbf1ff;" ></th>
-        <th style="background-color:#fbf1ff">Pandas Time</th>
+        <th style="background-color:#fbf1ff">pandas Time</th>
         <th style="background-color:#fbf1ff">PyKX Time</th>
     </tr>
     <tr style="background-color:#fbf1ff; border-top: 1px solid #000000">
@@ -17814,10 +17814,10 @@ Note: you may need to restart the kernel to use updated packages.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div class="alert alert-block alert-success" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
 <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px; font-size: 115%;">
-<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative: Final table
+<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;pandas Alternative: Final table
 </div>
 <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
-<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> This is another bottleneck we encountered on our profiling. On Pandas, the code looked kind of similar, with a simple join and an asof join: </p>        
+<p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> This is another bottleneck we encountered on our profiling. On pandas, the code looked kind of similar, with a simple join and an asof join: </p>        
 <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> complete = traffic.merge(distance_table, on=["traffic_station"], how="inner")
 >>> complete = pd.merge_asof(complete.sort_values(["date"]), weather, on='date', by=["weather_station"])
 </code><br>
@@ -17825,7 +17825,7 @@ Note: you may need to restart the kernel to use updated packages.
 <table>
     <tr style="background-color: #FFFFFF;">
         <th style="background-color: #fbf1ff;" ></th>
-        <th style="background-color:#fbf1ff">Pandas Time</th>
+        <th style="background-color:#fbf1ff">pandas Time</th>
         <th style="background-color:#fbf1ff">PyKX Time</th>
     </tr>
     <tr style= "border-top: 1px solid #000000">
@@ -17894,7 +17894,7 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Throughout this transition from Pandas, the primary challenge emerged while migrating the <code>time_window</code> function, given its reliance on loops. Our approach involved first comprehending the input data, defining the desired output, and then formulating an idiomatic q implementation rather than a direct 1:1 migration. This method proved more time-efficient.</p>
+<p>Throughout this transition from pandas, the primary challenge emerged while migrating the <code>time_window</code> function, given its reliance on loops. Our approach involved first comprehending the input data, defining the desired output, and then formulating an idiomatic q implementation rather than a direct 1:1 migration. This method proved more time-efficient.</p>
 <p>In this scenario, our input consisted of a table, and our desired output was a list of matrices for each station. To facilitate this process, we devised multiple functions that proved invaluable:</p>
 
 </div>
@@ -18076,7 +18076,7 @@ Note: you may need to restart the kernel to use updated packages.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <div class="alert alert-block alert-success" style="background-color: #FFFFFF; border: 0px solid; padding: 0px;box-shadow: 2px 2px #3841459c; border-left: 3px solid #953eff;margin-left: 5%; margin-right: 5%; border-top: 3px solid #953eff">
 <div class="alert-header custom-card-header" style="background-color: #fad5ff; color: black; padding: 10px; font-size: 115%;">
-<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;Pandas Alternative: Model Ingestion
+<i class="fa fa-commenting" aria-hidden="true" style="color:#953eff"></i>&nbsp;&nbsp;&nbsp;pandas Alternative: Model Ingestion
 </div>
 <div style="background-color: #fbf1ff;  padding: 40px; padding-top:30px; padding-bottom:20px">
 <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%;line-weight: 1.5"> This is the last bottleneck we ran into while doing our profiling. We used the Python Sklearn MinMax scaler for this. </p> <code style="background-color: #eee;border: 1px solid #999;display: block;padding: 10px;margin-left: 8%;margin-right: 10%;margin-bottom: 0px; color:black"> >>> from sklearn.preprocessing import MinMaxScaler
@@ -18108,7 +18108,7 @@ Note: you may need to restart the kernel to use updated packages.
 <table>
     <tr style="background-color: #FFFFFF;">
         <th style="background-color: #fbf1ff;" ></th>
-        <th style="background-color:#fbf1ff">Pandas Time</th>
+        <th style="background-color:#fbf1ff">pandas Time</th>
         <th style="background-color:#fbf1ff">PyKX Time</th>
     </tr>
     <tr style= "border-top: 1px solid #000000">
@@ -18346,7 +18346,7 @@ class="
 <table>
 <thead><tr>
 <th>         </th>
-<th>Pandas Time    </th>
+<th>pandas Time    </th>
 <th>PyKX Time       </th>
 </tr>
 </thead>
@@ -18426,7 +18426,7 @@ class="
 
 <p style="color: black; margin-top:0%; text-align: left;margin-left: 5%; margin-right: 5%; margin-bottom: 15px;font-size: 115%; line-weight: 1.5"> Objects from the Python memory can be retrieved using <code>pykx.get</code> and transmitted using <code>pykx.set</code>. The Python data type to be employed in the transformation can be specified using <code>.pykx.setdefault</code>.</p>
 </div>
-</div><p>This function expects two Pandas DataFrames as input, so we need to change the default conversion type from Numpy to Pandas:</p>
+</div><p>This function expects two pandas DataFrames as input, so we need to change the default conversion type from NumPy to pandas:</p>
 
 <pre><code>.pykx.setdefault"pd";</code></pre>
 <p>Having done this, we can "move" our input variables to the Python memory space using <code>.pykx.set</code></p>
@@ -18450,7 +18450,7 @@ res:modelpredict[train[0][3403]];</code></pre>
 <table>
 <thead><tr>
 <th>         </th>
-<th>Pandas Time    </th>
+<th>pandas Time    </th>
 <th>PyKX Time       </th>
 <th>q Time</th>
 </tr>
@@ -18495,14 +18495,14 @@ res:modelpredict[train[0][3403]];</code></pre>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Final-thoughts">Final thoughts<a class="anchor" id="t5" /><a class="anchor-link" href="#Final-thoughts">&#182;</a></h2><p>Overall this project turned out smoother than expected thanks to PyKX. It allowed us to get a foothold on the kdb+/q ecosystem before making the full transition to using q code, which on itself it's impressive. We achieved our goals of reducing execution time, as we saw throughout this post, and learned a lot about the kdb+/q ecosystem and its technologies.</p>
-<p>It wasn't all smooth and sail though. For instance, we hit a fundamental obstacle when using the Pandas API. In an ideal world, the transition from Pandas to PyKX using this API would be as simple as importing PyKX, enabling a flag and getting the input tables as PyKX objects. However, since we relied on operations such as <code>group_by</code> and <code>melt</code>, it ended up being unfeasible since these operations were not yet implemented and we would have to manually code them, which would take a long time on itself. We should note, however, that this feature is still on beta, so we look forward to future improvements in this regard since it would make migrations like this one much simpler once it becomes a drop-in replacement for Pandas calls.</p>
+<p>It wasn't all smooth and sail though. For instance, we hit a fundamental obstacle when using the pandas API. In an ideal world, the transition from pandas to PyKX using this API would be as simple as importing PyKX, enabling a flag and getting the input tables as PyKX objects. However, since we relied on operations such as <code>group_by</code> and <code>melt</code>, it ended up being unfeasible since these operations were not yet implemented and we would have to manually code them, which would take a long time on itself. We should note, however, that this feature is still on beta, so we look forward to future improvements in this regard since it would make migrations like this one much simpler once it becomes a drop-in replacement for pandas calls.</p>
 <p>In summary, with the experience we gained we dare to recommend you following these steps as a PyKX migration guide:</p>
 <ol>
 <li>Migrate the original data to a kdb+/q environment or PyKX objects.</li>
 <li>Profile the original code to locate bottlenecks. This allows us to put the focus on the heavier parts of our process.</li>
 <li>Once located, migrate those parts alone to PyKX. You <strong>will</strong> take a performance hit when moving data from memory spaces, but 4t's important to know the potential gains that are possible, so measure the migrated bottlenecks alone to see the difference.</li>
 <li>If your tables are not that large, you may be able to get away with it as-is, not needing to do a full migration. If that's the case then great! You are done. However, if you notice that the performance hit when moving data between memory spaces is actually hindering the process, consider a full migration to PyKX.</li>
-<li>If a full migration to PyKX is needed, then first take a look at the Pandas API. By the time you read this, it may have already improved compatibility and could be a drop-in replacement for Pandas. If it's not the case you will need to familiarise yourself with PyKX and get your hands dirty as we had to.</li>
+<li>If a full migration to PyKX is needed, then first take a look at the pandas API. By the time you read this, it may have already improved compatibility and could be a drop-in replacement for pandas. If it's not the case you will need to familiarise yourself with PyKX and get your hands dirty as we had to.</li>
 </ol>
 <p>We hope this post could serve as a guide of sorts for those that want to familiarise themselves with PyKX and the kdb+/q ecosystem since it brings a lot to the table. In the end we were able to achieve a full 1:1 migration to PyKX and even to q with pykx.q, which is impressive given the differences between the languages and their philosophy all while notably cutting execution time. Below you will find some additional references to continue learning PyKX. Have fun with PyKX!</p>
 
